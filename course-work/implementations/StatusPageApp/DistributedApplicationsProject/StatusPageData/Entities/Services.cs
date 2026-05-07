@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace StatusPageData.Entities
 {
-    public class Services
+    public class Services : BaseEntity
     {
-        public int Id { get; set; }
         public required string Name { get; set; }
 
         public required string TargetUrl { get; set; }

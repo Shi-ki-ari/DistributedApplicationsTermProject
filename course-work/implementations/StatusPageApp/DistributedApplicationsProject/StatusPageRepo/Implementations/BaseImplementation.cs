@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StatusPageData;
+using StatusPageData.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace StatusPageRepo.Implementations
 {
-    public class BaseImplementation<T> : IRepo<T> where T : class
+    public class BaseImplementation<T> : IRepo<T> where T : BaseEntity
     {
 
         private readonly AppDbContext _context;

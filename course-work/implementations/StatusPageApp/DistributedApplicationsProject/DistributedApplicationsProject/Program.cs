@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.EntityFrameworkCore;
 using StatusPageData;
+using StatusPageRepo;
+using StatusPageRepo.Implementations;
+using StatusPageServices.Interfaces;
+using StatusPageServices.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +20,9 @@ var connectionString = builder.Configuration.GetConnectionString("StatusPageDb")
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddScoped(typeof(IRepo<>), typeof(BaseImplementation<>));
+builder.Services.AddScoped(typeof(IService<>), typeof(BaseService<>));
 
 var app = builder.Build();
 

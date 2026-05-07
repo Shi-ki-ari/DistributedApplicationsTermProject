@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace StatusPageData.Entities
 {
-    public class EngineersEntity
+    public class EngineersEntity : BaseEntity
     {
-        public int Id { get; set; }
 
         public required string Name { get; set; }
 

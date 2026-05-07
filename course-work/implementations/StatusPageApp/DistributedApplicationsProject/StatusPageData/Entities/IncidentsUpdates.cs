@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace StatusPageData.Entities
 {
-    public class IncidentsUpdates
+    public class IncidentsUpdates : BaseEntity
     {
-        public int Id { get; set; }
-
         public required string Message { get; set; }
 
         public DateTime PostedAt { get ; set; }
