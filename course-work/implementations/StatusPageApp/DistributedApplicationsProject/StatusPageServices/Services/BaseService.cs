@@ -5,7 +5,7 @@ using StatusPageServices.Interfaces;
 
 namespace StatusPageServices.Services
 {
-    public abstract class BaseService<T> : IService<T> where T : BaseEntity
+    public abstract class BaseService<T> where T : BaseEntity
     {
 
         private readonly IRepo<T> _repo;
@@ -15,28 +15,28 @@ namespace StatusPageServices.Services
             _repo = repo;
         }
 
-        public async Task AddAsync(T entity)
+        public async Task AddEntityAsync(T entity)
         {
             await _repo.AddAsync(entity);
 
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteEntityAsync(int id)
         {
             await _repo.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllEntityAsync()
         {
             return await _repo.GetAllAsync();
         }
 
-        public async Task<T?> GetById(int id)
+        public async Task<T?> GetEntityById(int id)
         {
             return await _repo.GetById(id);
         }
 
-        public async Task UpdateAsync(T entity)
+        public async Task UpdateEntityAsync(T entity)
         {
             await _repo.UpdateAsync(entity);
         }

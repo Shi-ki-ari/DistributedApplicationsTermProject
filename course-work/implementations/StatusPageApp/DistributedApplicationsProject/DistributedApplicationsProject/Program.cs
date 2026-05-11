@@ -1,5 +1,7 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using StatusPageData;
 using StatusPageRepo;
 using StatusPageRepo.Implementations;
@@ -22,7 +24,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped(typeof(IRepo<>), typeof(BaseImplementation<>));
-builder.Services.AddScoped(typeof(IService<>), typeof(BaseService<>));
+// Register concrete services
+builder.Services.AddScoped<IIncidentsService, IncidentService>();
+builder.Services.AddScoped<IEngineersService, EngineersService>();
+builder.Services.AddScoped<IServicesService, ServicesService>();
+builder.Services.AddScoped<IServiceCategoriesService, ServiceCategoriesService>();
+builder.Services.AddScoped<IIncidentUpdatesService, IncidentUpdatesService>();
 
 var app = builder.Build();
 
