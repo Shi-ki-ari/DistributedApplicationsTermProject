@@ -24,4 +24,9 @@
     <ProjectReference Include="..\StatusPageRepo\StatusPageRepo.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="RequestDTO\ServiceCheck\" />
+    <Folder Include="ResponseDTO\ServiceCheck\" />
+  </ItemGroup>
+
 </Project>

@@ -17,25 +17,11 @@ namespace StatusPageServices.Services
 
         public async Task<ServiceCategoryDto> CreateAsync(CreateServiceCategoryDto dto)
         {
-            var e = new ServiceCategories
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-                DisplayOrder = dto.DisplayOrder,
-                CreatedAt = System.DateTime.UtcNow,
-                Notify = dto.Notify
-            };
+            var e = ToEntity(dto);
 
             await AddEntityAsync(e);
 
-            return new ServiceCategoryDto(
-                e.Id,
-                e.Name,
-                e.Description,
-                e.DisplayOrder,
-                e.CreatedAt,
-                e.Notify
-            );
+            return ToDto(e);
         }
 
         public async Task DeleteAsync(int id)
@@ -46,21 +32,14 @@ namespace StatusPageServices.Services
         public async Task<IEnumerable<ServiceCategoryDto>> GetAllAsync()
         {
             var entities = await GetAllEntityAsync();
-            return entities.Select(e => new ServiceCategoryDto(
-                e.Id,
-                e.Name,
-                e.Description,
-                e.DisplayOrder,
-                e.CreatedAt,
-                e.Notify
-            ));
+            return entities.Select(ToDto);
         }
 
         public async Task<ServiceCategoryDto?> GetByIdAsync(int id)
         {
             var e = await GetEntityById(id);
             if (e is null) return null;
-            return new ServiceCategoryDto(e.Id, e.Name, e.Description, e.DisplayOrder, e.CreatedAt, e.Notify);
+            return ToDto(e);
         }
 
         public async Task UpdateAsync(int id, UpdateServiceCategoryDto dto)
@@ -68,12 +47,41 @@ namespace StatusPageServices.Services
             var existing = await GetEntityById(id);
             if (existing is null) return;
 
-            existing.Name = dto.Name;
-            existing.Description = dto.Description;
-            existing.DisplayOrder = dto.DisplayOrder;
-            existing.Notify = dto.Notify;
+            ApplyUpdate(existing, dto);
 
             await UpdateEntityAsync(existing);
+        }
+
+        private static ServiceCategories ToEntity(CreateServiceCategoryDto dto)
+        {
+            return new ServiceCategories
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                DisplayOrder = dto.DisplayOrder,
+                CreatedAt = System.DateTime.UtcNow,
+                Notify = dto.Notify
+            };
+        }
+
+        private static ServiceCategoryDto ToDto(ServiceCategories entity)
+        {
+            return new ServiceCategoryDto(
+                entity.Id,
+                entity.Name,
+                entity.Description,
+                entity.DisplayOrder,
+                entity.CreatedAt,
+                entity.Notify
+            );
+        }
+
+        private static void ApplyUpdate(ServiceCategories entity, UpdateServiceCategoryDto dto)
+        {
+            entity.Name = dto.Name;
+            entity.Description = dto.Description;
+            entity.DisplayOrder = dto.DisplayOrder;
+            entity.Notify = dto.Notify;
         }
 
     }

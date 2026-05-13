@@ -17,38 +17,24 @@ namespace StatusPageServices.Services
 
         public async Task<EngineerDto> CreateAsync(CreateEngineerDto dto)
         {
-            var e = new EngineersEntity
-            {
-                Name = dto.Name,
-                Email = dto.Email,
-                HiredDate = dto.HiredDate ?? System.DateTime.UtcNow,
-                OnCall = dto.OnCall,
-                HourlyRate = dto.HourlyRate
-            };
+            var e = ToEntity(dto);
 
             await AddEntityAsync(e);
 
-            return new EngineerDto(e.Id, e.Name, e.Email, e.HiredDate, e.OnCall, e.HourlyRate);
+            return ToDto(e);
         }
 
         public async Task<IEnumerable<EngineerDto>> GetAllAsync()
         {
             var entities = await GetAllEntityAsync();
-            return entities.Select(e => new EngineerDto(
-                e.Id,
-                e.Name,
-                e.Email,
-                e.HiredDate,
-                e.OnCall,
-                e.HourlyRate
-            ));
+            return entities.Select(ToDto);
         }
 
         public async Task<EngineerDto?> GetByIdAsync(int id)
         {
             var e = await GetEntityById(id);
             if (e is null) return null;
-            return new EngineerDto(e.Id, e.Name, e.Email, e.HiredDate, e.OnCall, e.HourlyRate);
+            return ToDto(e);
         }
 
         public async Task UpdateAsync(int id, UpdateEngineerDto dto)
@@ -56,11 +42,7 @@ namespace StatusPageServices.Services
             var existing = await GetEntityById(id);
             if (existing is null) return;
 
-            existing.Name = dto.Name;
-            existing.Email = dto.Email;
-            existing.HiredDate = dto.HiredDate;
-            existing.OnCall = dto.OnCall;
-            existing.HourlyRate = dto.HourlyRate;
+            ApplyUpdate(existing, dto);
 
             await UpdateEntityAsync(existing);
         }
@@ -68,6 +50,32 @@ namespace StatusPageServices.Services
         public async Task DeleteAsync(int id)
         {
             await DeleteEntityAsync(id);
+        }
+
+        private static EngineersEntity ToEntity(CreateEngineerDto dto)
+        {
+            return new EngineersEntity
+            {
+                Name = dto.Name,
+                Email = dto.Email,
+                HiredDate = dto.HiredDate ?? System.DateTime.UtcNow,
+                OnCall = dto.OnCall,
+                HourlyRate = dto.HourlyRate
+            };
+        }
+
+        private static EngineerDto ToDto(EngineersEntity entity)
+        {
+            return new EngineerDto(entity.Id, entity.Name, entity.Email, entity.HiredDate, entity.OnCall, entity.HourlyRate);
+        }
+
+        private static void ApplyUpdate(EngineersEntity entity, UpdateEngineerDto dto)
+        {
+            entity.Name = dto.Name;
+            entity.Email = dto.Email;
+            entity.HiredDate = dto.HiredDate;
+            entity.OnCall = dto.OnCall;
+            entity.HourlyRate = dto.HourlyRate;
         }
 
 

@@ -30,6 +30,7 @@ builder.Services.AddScoped<IEngineersService, EngineersService>();
 builder.Services.AddScoped<IServicesService, ServicesService>();
 builder.Services.AddScoped<IServiceCategoriesService, ServiceCategoriesService>();
 builder.Services.AddScoped<IIncidentUpdatesService, IncidentUpdatesService>();
+builder.Services.AddScoped<IServiceChecksService, ServiceChecksService>();
 
 var app = builder.Build();
 

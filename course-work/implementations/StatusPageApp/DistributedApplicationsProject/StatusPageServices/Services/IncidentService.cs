@@ -14,7 +14,44 @@ namespace StatusPageServices.Services
 
         public async Task<IncidentDto> CreateAsync(CreateIncidentDto dto)
         {
-            var e = new IncidentsEntity
+            var e = ToEntity(dto);
+
+            await AddEntityAsync(e);
+
+            return ToDto(e);
+        }
+
+        public async Task<IEnumerable<IncidentDto>> GetAllAsync()
+        {
+            var entities = await GetAllEntityAsync();
+            return entities.Select(ToDto);
+        }
+
+        public async Task<IncidentDto?> GetByIdAsync(int id)
+        {
+            var e = await GetEntityById(id);
+            if (e is null) return null;
+            return ToDto(e);
+        }
+
+        public async Task UpdateAsync(int id, UpdateIncidentDto dto)
+        {
+            var existing = await GetEntityById(id);
+            if (existing is null) return;
+
+            ApplyUpdate(existing, dto);
+
+            await UpdateEntityAsync(existing);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            await DeleteEntityAsync(id);
+        }
+
+        private static IncidentsEntity ToEntity(CreateIncidentDto dto)
+        {
+            return new IncidentsEntity
             {
                 Description = dto.Description,
                 StartTime = dto.StartTime,
@@ -23,67 +60,29 @@ namespace StatusPageServices.Services
                 ServiceId = dto.ServiceId,
                 AssignedEngineerId = dto.AssignedEngineerId ?? 0
             };
+        }
 
-            await AddEntityAsync(e);
-
+        private static IncidentDto ToDto(IncidentsEntity entity)
+        {
             return new IncidentDto(
-                e.Id,
-                e.Description,
-                e.StartTime,
-                e.EndTime,
-                e.IsScheduled,
-                e.ServiceId,
-                e.AssignedEngineerId == 0 ? null : (int?)e.AssignedEngineerId
+                entity.Id,
+                entity.Description,
+                entity.StartTime,
+                entity.EndTime,
+                entity.IsScheduled,
+                entity.ServiceId,
+                entity.AssignedEngineerId == 0 ? null : (int?)entity.AssignedEngineerId
             );
         }
 
-        public async Task<IEnumerable<IncidentDto>> GetAllAsync()
+        private static void ApplyUpdate(IncidentsEntity entity, UpdateIncidentDto dto)
         {
-            var entities = await GetAllEntityAsync();
-            return entities.Select(e => new IncidentDto(
-                e.Id,
-                e.Description,
-                e.StartTime,
-                e.EndTime,
-                e.IsScheduled,
-                e.ServiceId,
-                e.AssignedEngineerId == 0 ? null : (int?)e.AssignedEngineerId
-            ));
-        }
-
-        public async Task<IncidentDto?> GetByIdAsync(int id)
-        {
-            var e = await GetEntityById(id);
-            if (e is null) return null;
-            return new IncidentDto(
-                e.Id,
-                e.Description,
-                e.StartTime,
-                e.EndTime,
-                e.IsScheduled,  
-                e.ServiceId,
-                e.AssignedEngineerId == 0 ? null : (int?)e.AssignedEngineerId
-            );
-        }
-
-        public async Task UpdateAsync(int id, UpdateIncidentDto dto)
-        {
-            var existing = await GetEntityById(id);
-            if (existing is null) return;
-
-            existing.Description = dto.Description;
-            existing.StartTime = dto.StartTime;
-            existing.EndTime = dto.EndTime;
-            existing.IsScheduled = dto.IsScheduled;
-            existing.ServiceId = dto.ServiceId;
-            existing.AssignedEngineerId = dto.AssignedEngineerId ?? 0;
-
-            await UpdateEntityAsync(existing);
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            await DeleteEntityAsync(id);
+            entity.Description = dto.Description;
+            entity.StartTime = dto.StartTime;
+            entity.EndTime = dto.EndTime;
+            entity.IsScheduled = dto.IsScheduled;
+            entity.ServiceId = dto.ServiceId;
+            entity.AssignedEngineerId = dto.AssignedEngineerId ?? 0;
         }
     }
 }

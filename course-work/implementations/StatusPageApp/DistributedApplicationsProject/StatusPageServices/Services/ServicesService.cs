@@ -17,27 +17,11 @@ namespace StatusPageServices.Services
 
         public async Task<ServiceDto> CreateAsync(CreateServiceDto dto)
         {
-            var e = new StatusPageData.Entities.Services
-            {
-                Name = dto.Name,
-                TargetUrl = dto.TargetUrl,
-                IsOnline = dto.IsOnline,
-                DateAdded = System.DateTime.UtcNow,
-                UptimePercentage = 0m,
-                CategoryId = dto.CategoryId
-            };
+            var e = ToEntity(dto);
 
             await AddEntityAsync(e);
 
-            return new ServiceDto(
-                e.Id,
-                e.Name,
-                e.TargetUrl,
-                e.IsOnline,
-                e.DateAdded,
-                e.UptimePercentage,
-                e.CategoryId
-            );
+            return ToDto(e);
         }
 
         public async Task DeleteAsync(int id)
@@ -48,22 +32,14 @@ namespace StatusPageServices.Services
         public async Task<IEnumerable<ServiceDto>> GetAllAsync()
         {
             var entities = await GetAllEntityAsync();
-            return entities.Select(e => new ServiceDto(
-                e.Id,
-                e.Name,
-                e.TargetUrl,
-                e.IsOnline,
-                e.DateAdded,
-                e.UptimePercentage,
-                e.CategoryId
-            ));
+            return entities.Select(ToDto);
         }
 
         public async Task<ServiceDto?> GetByIdAsync(int id)
         {
             var e = await GetEntityById(id);
             if (e is null) return null;
-            return new ServiceDto(e.Id, e.Name, e.TargetUrl, e.IsOnline, e.DateAdded, e.UptimePercentage, e.CategoryId);
+            return ToDto(e);
         }
 
         public async Task UpdateAsync(int id, UpdateServiceDto dto)
@@ -71,12 +47,43 @@ namespace StatusPageServices.Services
             var existing = await GetEntityById(id);
             if (existing is null) return;
 
-            existing.Name = dto.Name;
-            existing.TargetUrl = dto.TargetUrl;
-            existing.IsOnline = dto.IsOnline;
-            existing.CategoryId = dto.CategoryId;
+            ApplyUpdate(existing, dto);
 
             await UpdateEntityAsync(existing);
+        }
+
+        private static StatusPageData.Entities.Services ToEntity(CreateServiceDto dto)
+        {
+            return new StatusPageData.Entities.Services
+            {
+                Name = dto.Name,
+                TargetUrl = dto.TargetUrl,
+                IsOnline = dto.IsOnline,
+                DateAdded = System.DateTime.UtcNow,
+                UptimePercentage = 0m,
+                CategoryId = dto.CategoryId
+            };
+        }
+
+        private static ServiceDto ToDto(StatusPageData.Entities.Services entity)
+        {
+            return new ServiceDto(
+                entity.Id,
+                entity.Name,
+                entity.TargetUrl,
+                entity.IsOnline,
+                entity.DateAdded,
+                entity.UptimePercentage,
+                entity.CategoryId
+            );
+        }
+
+        private static void ApplyUpdate(StatusPageData.Entities.Services entity, UpdateServiceDto dto)
+        {
+            entity.Name = dto.Name;
+            entity.TargetUrl = dto.TargetUrl;
+            entity.IsOnline = dto.IsOnline;
+            entity.CategoryId = dto.CategoryId;
         }
 
     }

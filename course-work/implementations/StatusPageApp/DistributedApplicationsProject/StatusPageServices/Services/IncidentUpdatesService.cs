@@ -17,27 +17,11 @@ namespace StatusPageServices.Services
 
         public async Task<IncidentUpdateDto> CreateAsync(CreateIncidentUpdateDto dto)
         {
-            var e = new IncidentsUpdates
-            {
-                Message = dto.Message,
-                PostedAt = System.DateTime.UtcNow,
-                UpdateStatus = dto.UpdateStatus,
-                IsSystemGenerated = dto.IsSystemGenerated,
-                IncidentId = dto.IncidentId,
-                EngineerId = dto.EngineerId
-            };
+            var e = ToEntity(dto);
 
             await AddEntityAsync(e);
 
-            return new IncidentUpdateDto(
-                e.Id,
-                e.Message,
-                e.PostedAt,
-                e.UpdateStatus,
-                e.IsSystemGenerated,
-                e.IncidentId,
-                e.EngineerId
-            );
+            return ToDto(e);
         }
 
         public async Task DeleteAsync(int id)
@@ -48,22 +32,14 @@ namespace StatusPageServices.Services
         public async Task<IEnumerable<IncidentUpdateDto>> GetAllAsync()
         {
             var entities = await GetAllEntityAsync();
-            return entities.Select(e => new IncidentUpdateDto(
-                e.Id,
-                e.Message,
-                e.PostedAt,
-                e.UpdateStatus,
-                e.IsSystemGenerated,
-                e.IncidentId,
-                e.EngineerId
-            ));
+            return entities.Select(ToDto);
         }
 
         public async Task<IncidentUpdateDto?> GetByIdAsync(int id)
         {
             var e = await GetEntityById(id);
             if (e is null) return null;
-            return new IncidentUpdateDto(e.Id, e.Message, e.PostedAt, e.UpdateStatus, e.IsSystemGenerated, e.IncidentId, e.EngineerId);
+            return ToDto(e);
         }
 
         public async Task UpdateAsync(int id, UpdateIncidentUpdateDto dto)
@@ -71,13 +47,44 @@ namespace StatusPageServices.Services
             var existing = await GetEntityById(id);
             if (existing is null) return;
 
-            existing.Message = dto.Message;
-            existing.UpdateStatus = dto.UpdateStatus;
-            existing.IsSystemGenerated = dto.IsSystemGenerated;
-            existing.IncidentId = dto.IncidentId;
-            existing.EngineerId = dto.EngineerId;
+            ApplyUpdate(existing, dto);
 
             await UpdateEntityAsync(existing);
+        }
+
+        private static IncidentsUpdates ToEntity(CreateIncidentUpdateDto dto)
+        {
+            return new IncidentsUpdates
+            {
+                Message = dto.Message,
+                PostedAt = System.DateTime.UtcNow,
+                UpdateStatus = dto.UpdateStatus,
+                IsSystemGenerated = dto.IsSystemGenerated,
+                IncidentId = dto.IncidentId,
+                EngineerId = dto.EngineerId
+            };
+        }
+
+        private static IncidentUpdateDto ToDto(IncidentsUpdates entity)
+        {
+            return new IncidentUpdateDto(
+                entity.Id,
+                entity.Message,
+                entity.PostedAt,
+                entity.UpdateStatus,
+                entity.IsSystemGenerated,
+                entity.IncidentId,
+                entity.EngineerId
+            );
+        }
+
+        private static void ApplyUpdate(IncidentsUpdates entity, UpdateIncidentUpdateDto dto)
+        {
+            entity.Message = dto.Message;
+            entity.UpdateStatus = dto.UpdateStatus;
+            entity.IsSystemGenerated = dto.IsSystemGenerated;
+            entity.IncidentId = dto.IncidentId;
+            entity.EngineerId = dto.EngineerId;
         }
 
     }

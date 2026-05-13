@@ -1,7 +1,7 @@
 namespace StatusPageServices.RequestDTO.Services
 {
     public record UpdateServiceDto(
-        int Id,
+                int Id,
         string Name,
         string TargetUrl,
         int CategoryId,

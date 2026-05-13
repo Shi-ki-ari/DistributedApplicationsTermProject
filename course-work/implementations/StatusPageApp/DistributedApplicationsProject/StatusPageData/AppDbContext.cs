@@ -15,6 +15,7 @@ namespace StatusPageData
         public DbSet<EngineersEntity> EngineersEntities { get; set; } = null!;
         public DbSet<Services> Services { get; set; } = null!;
         public DbSet<ServiceCategories> ServiceCategories { get; set; } = null!;
+        public DbSet<ServiceCheck> ServiceChecks { get; set; } = null!;
         public DbSet<IncidentsUpdates> IncidentsUpdates { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

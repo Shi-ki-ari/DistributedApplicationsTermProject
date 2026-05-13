@@ -3,7 +3,7 @@ using System;
 namespace StatusPageServices.RequestDTO.IncidentUpdates
 {
     public record UpdateIncidentUpdateDto(
-        int Id,
+                int Id,
         string Message,
         string UpdateStatus,
         bool IsSystemGenerated,
