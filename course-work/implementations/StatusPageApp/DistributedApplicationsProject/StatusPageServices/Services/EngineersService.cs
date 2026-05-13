@@ -69,5 +69,7 @@ namespace StatusPageServices.Services
         {
             await DeleteEntityAsync(id);
         }
+
+
     }
 }

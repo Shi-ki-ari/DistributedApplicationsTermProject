@@ -60,7 +60,7 @@ namespace StatusPageServices.Services
                 e.Description,
                 e.StartTime,
                 e.EndTime,
-                e.IsScheduled,
+                e.IsScheduled,  
                 e.ServiceId,
                 e.AssignedEngineerId == 0 ? null : (int?)e.AssignedEngineerId
             );

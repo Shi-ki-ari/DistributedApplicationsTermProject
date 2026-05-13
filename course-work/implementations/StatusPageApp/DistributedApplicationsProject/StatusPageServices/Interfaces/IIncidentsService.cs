@@ -1,7 +1,6 @@
 using StatusPageServices.ResponseDTO.Incidents;
-
 using StatusPageServices.RequestDTO.Incidents;
-using StatusPageServices.ResponseDTO.Incidents;
+
 
 namespace StatusPageServices.Interfaces
 {
