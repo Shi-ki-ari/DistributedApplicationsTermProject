@@ -12,11 +12,11 @@ using StatusPageServices.ResponseDTO.ServiceChecks;
 
 namespace StatusPageServices.Services
 {
-    public class ServiceChecksService : BaseService<ServiceCheck>, IServiceChecksService
+    public class ServiceChecksService : BaseService<ServiceCheckEntity>, IServiceChecksService
     {
-        private readonly IRepo<StatusPageData.Entities.Services> _servicesRepo;
+        private readonly IRepo<StatusPageData.Entities.ServiceEntity> _servicesRepo;
 
-        public ServiceChecksService(IRepo<ServiceCheck> checksRepo, IRepo<StatusPageData.Entities.Services> servicesRepo) : base(checksRepo)
+        public ServiceChecksService(IRepo<ServiceCheckEntity> checksRepo, IRepo<StatusPageData.Entities.ServiceEntity> servicesRepo) : base(checksRepo)
         {
             _servicesRepo = servicesRepo;
         }
@@ -29,13 +29,13 @@ namespace StatusPageServices.Services
 
         public async Task<ServiceCheckDto?> GetByIdAsync(int id)
         {
-            var entity = await GetEntityById(id);
+            var entity = await GetEntityByIdAsync(id);
             return entity is null ? null : ToDto(entity);
         }
 
         public async Task<ServiceCheckDto> CreateAsync(CreateServiceCheckDto dto)
         {
-            var entity = new ServiceCheck
+            var entity = new ServiceCheckEntity
             {
                 ServiceId = dto.ServiceId,
                 CheckedAt = dto.CheckedAt,
@@ -66,10 +66,10 @@ namespace StatusPageServices.Services
             return resultsList.Select(ToDto);
         }
 
-        private static async Task<ServiceCheck> ProbeServiceAsync(StatusPageData.Entities.Services service)
+        private static async Task<ServiceCheckEntity> ProbeServiceAsync(StatusPageData.Entities.ServiceEntity service)
         {
             var target = TryGetPingTarget(service.TargetUrl);
-            var check = new ServiceCheck
+            var check = new ServiceCheckEntity
             {
                 ServiceId = service.Id,
                 CheckedAt = DateTime.UtcNow
@@ -110,7 +110,7 @@ namespace StatusPageServices.Services
             return string.IsNullOrWhiteSpace(targetUrl) ? null : targetUrl;
         }
 
-        private static ServiceCheckDto ToDto(ServiceCheck entity)
+        private static ServiceCheckDto ToDto(ServiceCheckEntity entity)
         {
             return new ServiceCheckDto(
                 entity.Id,
@@ -123,9 +123,9 @@ namespace StatusPageServices.Services
             );
         }
 
-        private static ServiceCheck ToEntity(CreateServiceCheckDto dto)
+        private static ServiceCheckEntity ToEntity(CreateServiceCheckDto dto)
         {
-            return new ServiceCheck
+            return new ServiceCheckEntity
             {
                 ServiceId = dto.ServiceId,
                 CheckedAt = dto.CheckedAt,

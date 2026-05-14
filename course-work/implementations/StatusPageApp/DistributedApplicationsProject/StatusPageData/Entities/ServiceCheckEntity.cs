@@ -2,7 +2,7 @@ using System;
 
 namespace StatusPageData.Entities
 {
-    public class ServiceCheck : BaseEntity
+    public class ServiceCheckEntity : BaseEntity
     {
         public int ServiceId { get; set; }
 
@@ -17,6 +17,6 @@ namespace StatusPageData.Entities
         public string? ErrorMessage { get; set; }
 
         // Navigation
-        public Services Service { get; set; } = null!;
+        public ServiceEntity Service { get; set; } = null!;
     }
 }

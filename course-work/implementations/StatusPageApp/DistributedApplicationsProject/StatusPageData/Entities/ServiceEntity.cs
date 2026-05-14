@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StatusPageData.Entities
 {
-    public class Services : BaseEntity
+    public class ServiceEntity : BaseEntity
     {
         public required string Name { get; set; }
 
@@ -19,9 +19,9 @@ namespace StatusPageData.Entities
 
         public int CategoryId { get; set; }
         // Navigation properties
-        public ServiceCategories Category { get; set; } = null!;
+        public ServiceCategoryEntity Category { get; set; } = null!;
 
-        public ICollection<IncidentsEntity> Incidents { get; set; } = new List<IncidentsEntity>();
+        public ICollection<IncidentEntity> Incidents { get; set; } = new List<IncidentEntity>();
 
     }
 }

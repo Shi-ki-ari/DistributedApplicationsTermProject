@@ -1,7 +1,6 @@
 using StatusPageServices.ResponseDTO.Engineers;
-
 using StatusPageServices.RequestDTO.Engineers;
-using StatusPageServices.ResponseDTO.Engineers;
+
 
 namespace StatusPageServices.Interfaces
 {

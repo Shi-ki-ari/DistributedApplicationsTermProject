@@ -9,9 +9,9 @@ using StatusPageServices.ResponseDTO.IncidentUpdates;
 
 namespace StatusPageServices.Services
 {
-    public class IncidentUpdatesService : BaseService<IncidentsUpdates>, IIncidentUpdatesService
+    public class IncidentUpdatesService : BaseService<IncidentUpdateEntity>, IIncidentUpdatesService
     {
-        public IncidentUpdatesService(IRepo<IncidentsUpdates> repo) : base(repo)
+        public IncidentUpdatesService(IRepo<IncidentUpdateEntity> repo) : base(repo)
         {
         }
 
@@ -37,14 +37,14 @@ namespace StatusPageServices.Services
 
         public async Task<IncidentUpdateDto?> GetByIdAsync(int id)
         {
-            var e = await GetEntityById(id);
+            var e = await GetEntityByIdAsync(id);
             if (e is null) return null;
             return ToDto(e);
         }
 
         public async Task UpdateAsync(int id, UpdateIncidentUpdateDto dto)
         {
-            var existing = await GetEntityById(id);
+            var existing = await GetEntityByIdAsync(id);
             if (existing is null) return;
 
             ApplyUpdate(existing, dto);
@@ -52,9 +52,9 @@ namespace StatusPageServices.Services
             await UpdateEntityAsync(existing);
         }
 
-        private static IncidentsUpdates ToEntity(CreateIncidentUpdateDto dto)
+        private static IncidentUpdateEntity ToEntity(CreateIncidentUpdateDto dto)
         {
-            return new IncidentsUpdates
+            return new IncidentUpdateEntity
             {
                 Message = dto.Message,
                 PostedAt = System.DateTime.UtcNow,
@@ -65,7 +65,7 @@ namespace StatusPageServices.Services
             };
         }
 
-        private static IncidentUpdateDto ToDto(IncidentsUpdates entity)
+        private static IncidentUpdateDto ToDto(IncidentUpdateEntity entity)
         {
             return new IncidentUpdateDto(
                 entity.Id,
@@ -78,7 +78,7 @@ namespace StatusPageServices.Services
             );
         }
 
-        private static void ApplyUpdate(IncidentsUpdates entity, UpdateIncidentUpdateDto dto)
+        private static void ApplyUpdate(IncidentUpdateEntity entity, UpdateIncidentUpdateDto dto)
         {
             entity.Message = dto.Message;
             entity.UpdateStatus = dto.UpdateStatus;

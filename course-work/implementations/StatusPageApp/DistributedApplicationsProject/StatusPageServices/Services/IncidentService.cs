@@ -6,9 +6,9 @@ using StatusPageServices.RequestDTO.Incidents;
 using StatusPageServices.ResponseDTO.Incidents;
 namespace StatusPageServices.Services
 {
-    public class IncidentService : BaseService<IncidentsEntity>, IIncidentsService
+    public class IncidentService : BaseService<IncidentEntity>, IIncidentsService
     {
-        public IncidentService(IRepo<IncidentsEntity> repo) : base(repo)
+        public IncidentService(IRepo<IncidentEntity> repo) : base(repo)
         {
         }
 
@@ -29,14 +29,14 @@ namespace StatusPageServices.Services
 
         public async Task<IncidentDto?> GetByIdAsync(int id)
         {
-            var e = await GetEntityById(id);
+            var e = await GetEntityByIdAsync(id);
             if (e is null) return null;
             return ToDto(e);
         }
 
         public async Task UpdateAsync(int id, UpdateIncidentDto dto)
         {
-            var existing = await GetEntityById(id);
+            var existing = await GetEntityByIdAsync(id);
             if (existing is null) return;
 
             ApplyUpdate(existing, dto);
@@ -49,9 +49,9 @@ namespace StatusPageServices.Services
             await DeleteEntityAsync(id);
         }
 
-        private static IncidentsEntity ToEntity(CreateIncidentDto dto)
+        private static IncidentEntity ToEntity(CreateIncidentDto dto)
         {
-            return new IncidentsEntity
+            return new IncidentEntity
             {
                 Description = dto.Description,
                 StartTime = dto.StartTime,
@@ -62,7 +62,7 @@ namespace StatusPageServices.Services
             };
         }
 
-        private static IncidentDto ToDto(IncidentsEntity entity)
+        private static IncidentDto ToDto(IncidentEntity entity)
         {
             return new IncidentDto(
                 entity.Id,
@@ -75,7 +75,7 @@ namespace StatusPageServices.Services
             );
         }
 
-        private static void ApplyUpdate(IncidentsEntity entity, UpdateIncidentDto dto)
+        private static void ApplyUpdate(IncidentEntity entity, UpdateIncidentDto dto)
         {
             entity.Description = dto.Description;
             entity.StartTime = dto.StartTime;

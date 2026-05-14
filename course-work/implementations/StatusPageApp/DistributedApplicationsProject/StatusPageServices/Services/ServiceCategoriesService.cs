@@ -9,9 +9,9 @@ using StatusPageServices.ResponseDTO.ServiceCategories;
 
 namespace StatusPageServices.Services
 {
-    public class ServiceCategoriesService : BaseService<ServiceCategories>, IServiceCategoriesService
+    public class ServiceCategoriesService : BaseService<ServiceCategoryEntity>, IServiceCategoriesService
     {
-        public ServiceCategoriesService(IRepo<ServiceCategories> repo) : base(repo)
+        public ServiceCategoriesService(IRepo<ServiceCategoryEntity> repo) : base(repo)
         {
         }
 
@@ -37,14 +37,14 @@ namespace StatusPageServices.Services
 
         public async Task<ServiceCategoryDto?> GetByIdAsync(int id)
         {
-            var e = await GetEntityById(id);
+            var e = await GetEntityByIdAsync(id);
             if (e is null) return null;
             return ToDto(e);
         }
 
         public async Task UpdateAsync(int id, UpdateServiceCategoryDto dto)
         {
-            var existing = await GetEntityById(id);
+            var existing = await GetEntityByIdAsync(id);
             if (existing is null) return;
 
             ApplyUpdate(existing, dto);
@@ -52,9 +52,9 @@ namespace StatusPageServices.Services
             await UpdateEntityAsync(existing);
         }
 
-        private static ServiceCategories ToEntity(CreateServiceCategoryDto dto)
+        private static ServiceCategoryEntity ToEntity(CreateServiceCategoryDto dto)
         {
-            return new ServiceCategories
+            return new ServiceCategoryEntity
             {
                 Name = dto.Name,
                 Description = dto.Description,
@@ -64,7 +64,7 @@ namespace StatusPageServices.Services
             };
         }
 
-        private static ServiceCategoryDto ToDto(ServiceCategories entity)
+        private static ServiceCategoryDto ToDto(ServiceCategoryEntity entity)
         {
             return new ServiceCategoryDto(
                 entity.Id,
@@ -76,7 +76,7 @@ namespace StatusPageServices.Services
             );
         }
 
-        private static void ApplyUpdate(ServiceCategories entity, UpdateServiceCategoryDto dto)
+        private static void ApplyUpdate(ServiceCategoryEntity entity, UpdateServiceCategoryDto dto)
         {
             entity.Name = dto.Name;
             entity.Description = dto.Description;

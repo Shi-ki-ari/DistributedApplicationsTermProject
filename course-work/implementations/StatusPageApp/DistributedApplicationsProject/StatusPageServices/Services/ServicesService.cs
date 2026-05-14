@@ -9,9 +9,9 @@ using StatusPageServices.ResponseDTO.Services;
 
 namespace StatusPageServices.Services
 {
-    public class ServicesService : BaseService<StatusPageData.Entities.Services>, IServicesService
+    public class ServicesService : BaseService<StatusPageData.Entities.ServiceEntity>, IServicesService
     {
-        public ServicesService(IRepo<StatusPageData.Entities.Services> repo) : base(repo)
+        public ServicesService(IRepo<StatusPageData.Entities.ServiceEntity> repo) : base(repo)
         {
         }
 
@@ -37,14 +37,14 @@ namespace StatusPageServices.Services
 
         public async Task<ServiceDto?> GetByIdAsync(int id)
         {
-            var e = await GetEntityById(id);
+            var e = await GetEntityByIdAsync(id);
             if (e is null) return null;
             return ToDto(e);
         }
 
         public async Task UpdateAsync(int id, UpdateServiceDto dto)
         {
-            var existing = await GetEntityById(id);
+            var existing = await GetEntityByIdAsync(id);
             if (existing is null) return;
 
             ApplyUpdate(existing, dto);
@@ -52,9 +52,9 @@ namespace StatusPageServices.Services
             await UpdateEntityAsync(existing);
         }
 
-        private static StatusPageData.Entities.Services ToEntity(CreateServiceDto dto)
+        private static StatusPageData.Entities.ServiceEntity ToEntity(CreateServiceDto dto)
         {
-            return new StatusPageData.Entities.Services
+            return new StatusPageData.Entities.ServiceEntity
             {
                 Name = dto.Name,
                 TargetUrl = dto.TargetUrl,
@@ -65,7 +65,7 @@ namespace StatusPageServices.Services
             };
         }
 
-        private static ServiceDto ToDto(StatusPageData.Entities.Services entity)
+        private static ServiceDto ToDto(StatusPageData.Entities.ServiceEntity entity)
         {
             return new ServiceDto(
                 entity.Id,
@@ -78,7 +78,7 @@ namespace StatusPageServices.Services
             );
         }
 
-        private static void ApplyUpdate(StatusPageData.Entities.Services entity, UpdateServiceDto dto)
+        private static void ApplyUpdate(StatusPageData.Entities.ServiceEntity entity, UpdateServiceDto dto)
         {
             entity.Name = dto.Name;
             entity.TargetUrl = dto.TargetUrl;

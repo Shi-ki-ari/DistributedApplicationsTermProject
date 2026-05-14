@@ -9,9 +9,9 @@ using StatusPageServices.ResponseDTO.Engineers;
 
 namespace StatusPageServices.Services
 {
-    public class EngineersService : BaseService<EngineersEntity>, IEngineersService
+    public class EngineersService : BaseService<EngineerEntity>, IEngineersService
     {
-        public EngineersService(IRepo<EngineersEntity> repo) : base(repo)
+        public EngineersService(IRepo<EngineerEntity> repo) : base(repo)
         {
         }
 
@@ -32,14 +32,14 @@ namespace StatusPageServices.Services
 
         public async Task<EngineerDto?> GetByIdAsync(int id)
         {
-            var e = await GetEntityById(id);
+            var e = await GetEntityByIdAsync(id);
             if (e is null) return null;
             return ToDto(e);
         }
 
         public async Task UpdateAsync(int id, UpdateEngineerDto dto)
         {
-            var existing = await GetEntityById(id);
+            var existing = await GetEntityByIdAsync(id);
             if (existing is null) return;
 
             ApplyUpdate(existing, dto);
@@ -52,9 +52,9 @@ namespace StatusPageServices.Services
             await DeleteEntityAsync(id);
         }
 
-        private static EngineersEntity ToEntity(CreateEngineerDto dto)
+        private static EngineerEntity ToEntity(CreateEngineerDto dto)
         {
-            return new EngineersEntity
+            return new EngineerEntity
             {
                 Name = dto.Name,
                 Email = dto.Email,
@@ -64,12 +64,12 @@ namespace StatusPageServices.Services
             };
         }
 
-        private static EngineerDto ToDto(EngineersEntity entity)
+        private static EngineerDto ToDto(EngineerEntity entity)
         {
             return new EngineerDto(entity.Id, entity.Name, entity.Email, entity.HiredDate, entity.OnCall, entity.HourlyRate);
         }
 
-        private static void ApplyUpdate(EngineersEntity entity, UpdateEngineerDto dto)
+        private static void ApplyUpdate(EngineerEntity entity, UpdateEngineerDto dto)
         {
             entity.Name = dto.Name;
             entity.Email = dto.Email;

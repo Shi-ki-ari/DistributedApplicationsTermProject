@@ -8,7 +8,7 @@ namespace StatusPageServices.Services
     public abstract class BaseService<T> where T : BaseEntity
     {
 
-        private readonly IRepo<T> _repo;
+        protected readonly IRepo<T> _repo;
 
         public BaseService(IRepo<T> repo)
         {
@@ -31,7 +31,7 @@ namespace StatusPageServices.Services
             return await _repo.GetAllAsync();
         }
 
-        public async Task<T?> GetEntityById(int id)
+        public async Task<T?> GetEntityByIdAsync(int id)
         {
             return await _repo.GetById(id);
         }

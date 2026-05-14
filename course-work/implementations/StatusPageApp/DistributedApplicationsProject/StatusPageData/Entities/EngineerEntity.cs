@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StatusPageData.Entities
 {
-    public class EngineersEntity : BaseEntity
+    public class EngineerEntity : BaseEntity
     {
 
         public required string Name { get; set; }
@@ -20,9 +20,9 @@ namespace StatusPageData.Entities
         public double HourlyRate { get; set; }
 
         // Navigation properties
-        public ICollection<IncidentsEntity> AssignedIncidents { get; set; } = new List<IncidentsEntity>();
+        public ICollection<IncidentEntity> AssignedIncidents { get; set; } = new List<IncidentEntity>();
 
-        public ICollection<IncidentsUpdates> IncidentUpdates { get; set; } = new List<IncidentsUpdates>();
+        public ICollection<IncidentUpdateEntity> IncidentUpdates { get; set; } = new List<IncidentUpdateEntity>();
 
     }
 }
