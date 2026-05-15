@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StatusPageServices.Interfaces;
+using StatusPageServices.RequestDTO;
 using StatusPageServices.RequestDTO.Services;
 using StatusPageServices.ResponseDTO.Services;
 
 namespace DistributedApplicationsProject.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ServicesController : ControllerBase
@@ -17,10 +20,9 @@ namespace DistributedApplicationsProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] PaginationQuery query)
         {
-            var result = await _servicesService.GetAllAsync();
-            return Ok(result);
+            return Ok(await _servicesService.GetPagedServicesAsync(query));
         }
 
         [HttpGet("{id}")]

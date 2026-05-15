@@ -1,4 +1,6 @@
+using StatusPageServices.RequestDTO;
 using StatusPageServices.RequestDTO.Services;
+using StatusPageServices.ResponseDTO;
 using StatusPageServices.ResponseDTO.Services;
 
 namespace StatusPageServices.Interfaces
@@ -10,5 +12,7 @@ namespace StatusPageServices.Interfaces
         Task<ServiceDto> CreateAsync(CreateServiceDto dto);
         Task UpdateAsync(int id, UpdateServiceDto dto);
         Task DeleteAsync(int id);
+
+        Task<PagedResult<ServiceDto>> GetPagedServicesAsync(PaginationQuery query);
     }
 }

@@ -12,5 +12,6 @@ namespace StatusPageServices.Interfaces
         Task<IncidentUpdateDto> CreateAsync(CreateIncidentUpdateDto dto);
         Task UpdateAsync(int id, UpdateIncidentUpdateDto dto);
         Task DeleteAsync(int id);
+
     }
 }

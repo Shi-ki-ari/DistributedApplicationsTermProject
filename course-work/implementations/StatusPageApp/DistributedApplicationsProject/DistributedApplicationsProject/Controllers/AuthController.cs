@@ -1,33 +1,36 @@
-﻿
-using API.Services;
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using StatusPageServices.Services;
 
-namespace API.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class AuthController : ControllerBase
+namespace StatusPageAPI.Controllers
 {
-    private readonly UserService userService;
-    private readonly TokenServices tokenService;
-
-    public AuthController(UserService userServiceInjection, TokenServices tokenServiceInjection)
+    [ApiController]
+    [Route("api/auth")]
+    public class AuthController : ControllerBase
     {
-        userService = userServiceInjection;
-        tokenService = tokenServiceInjection;
-    }
+        private readonly TokenService _tokenService;
 
-    [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
-    {
-        var user = userService.FindByUsername(request.Username);
+        public AuthController(TokenService tokenService)
+        {
+            _tokenService = tokenService;
+        }
 
-        if (user == null || !userService.VerifyPassword(request.Password, user.Password))
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginRequest request)
+        {
+            if (request.Username == "admin" && request.Password == "password123")
+            {
+                // If they match, print the VIP pass!
+                string token = _tokenService.CreateSimpleToken(request.Username);
+                return Ok(new { Token = token });
+            }
+
             return Unauthorized("Invalid username or password");
-
-        string token = tokenService.CreateToken(user);
-
-        return Ok(token);
+        }
     }
+
+    public class LoginRequest
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+}

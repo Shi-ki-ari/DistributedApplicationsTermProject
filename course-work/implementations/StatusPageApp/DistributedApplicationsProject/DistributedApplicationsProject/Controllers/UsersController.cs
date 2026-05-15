@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StatusPageServices.Interfaces;
 using StatusPageServices.RequestDTO.Users.StatusPageServices.RequestDTO.Users;
 using StatusPageServices.Services;
 
 namespace StatusPageAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase

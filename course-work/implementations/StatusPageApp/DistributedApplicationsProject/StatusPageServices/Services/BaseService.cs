@@ -2,6 +2,8 @@
 using StatusPageData.Entities;
 using StatusPageRepo;
 using StatusPageServices.Interfaces;
+using StatusPageServices.RequestDTO;
+using StatusPageServices.ResponseDTO;
 
 namespace StatusPageServices.Services
 {
@@ -40,5 +42,6 @@ namespace StatusPageServices.Services
         {
             await _repo.UpdateAsync(entity);
         }
+
     }
 }

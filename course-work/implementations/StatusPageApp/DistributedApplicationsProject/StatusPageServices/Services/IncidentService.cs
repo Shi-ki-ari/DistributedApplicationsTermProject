@@ -1,9 +1,11 @@
 ﻿using StatusPageData.Entities;
-using StatusPageData.Entities;
 using StatusPageRepo;
 using StatusPageServices.Interfaces;
+using StatusPageServices.RequestDTO;
 using StatusPageServices.RequestDTO.Incidents;
+using StatusPageServices.ResponseDTO;
 using StatusPageServices.ResponseDTO.Incidents;
+using System.Linq;
 namespace StatusPageServices.Services
 {
     public class IncidentService : BaseService<IncidentEntity>, IIncidentsService
@@ -53,6 +55,7 @@ namespace StatusPageServices.Services
         {
             return new IncidentEntity
             {
+                Title = dto.Title,
                 Description = dto.Description,
                 StartTime = dto.StartTime,
                 EndTime = dto.EndTime,
@@ -66,6 +69,7 @@ namespace StatusPageServices.Services
         {
             return new IncidentDto(
                 entity.Id,
+                entity.Title,
                 entity.Description,
                 entity.StartTime,
                 entity.EndTime,
@@ -83,6 +87,37 @@ namespace StatusPageServices.Services
             entity.IsScheduled = dto.IsScheduled;
             entity.ServiceId = dto.ServiceId;
             entity.AssignedEngineerId = dto.AssignedEngineerId ?? 0;
+        }
+
+        public async Task<PagedResult<IncidentDto>> GetPagedIncidentsAsync(PaginationQuery query)
+        {
+            var allIncidents = await _repo.GetAllAsync();
+
+            // FILTER: Search by Incident Title
+            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+            {
+                allIncidents = allIncidents.Where(i =>
+                    i.Title.Contains(query.SearchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // SORT: Newest Incidents at the top!
+            allIncidents = allIncidents.OrderByDescending(i => i.StartTime);
+
+            int totalCount = allIncidents.Count();
+
+            var pagedItems = allIncidents
+                .Skip((query.PageNumber - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(i => new IncidentDto(i.Id, i.Title, i.Description, i.StartTime, i.EndTime, i.IsScheduled, i.ServiceId, i.AssignedEngineerId == 0 ? null : (int?)i.AssignedEngineerId))
+                .ToList();
+
+            return new PagedResult<IncidentDto>
+            {
+                Items = pagedItems,
+                TotalCount = totalCount,
+                PageNumber = query.PageNumber,
+                PageSize = query.PageSize
+            };
         }
     }
 }

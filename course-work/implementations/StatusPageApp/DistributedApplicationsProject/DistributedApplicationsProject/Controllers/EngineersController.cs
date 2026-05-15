@@ -1,10 +1,14 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StatusPageServices.Interfaces;
+using StatusPageServices.RequestDTO;
 using StatusPageServices.RequestDTO.Engineers;
 using StatusPageServices.ResponseDTO.Engineers;
+using StatusPageServices.Services;
 
 namespace DistributedApplicationsProject.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class EngineersController : ControllerBase
@@ -17,9 +21,9 @@ namespace DistributedApplicationsProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllEngineers([FromQuery] PaginationQuery query)
         {
-            var result = await _engineersService.GetAllAsync();
+            var result = await _engineersService.GetPagedEngineersAsync(query);
             return Ok(result);
         }
 
@@ -52,5 +56,7 @@ namespace DistributedApplicationsProject.Controllers
             await _engineersService.DeleteAsync(id);
             return NoContent();
         }
+
+
     }
 }

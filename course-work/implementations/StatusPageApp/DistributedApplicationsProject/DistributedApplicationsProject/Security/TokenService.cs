@@ -1,33 +1,30 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using StatusPageData.Entities.StatusPageData.Entities;
 
-namespace API.Services;
-
-public class TokenServices
+namespace StatusPageServices.Services
 {
-    public string CreateToken(UserEntity user)
+    public class TokenService
     {
-        Claim[] claims = new Claim[]
+        public string CreateSimpleToken(string username)
         {
-            new Claim("loggedUserId", user.Id.ToString()),
-        };
 
-        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("mnogosigurnaparola123456789123456789"));
-        var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var claims = new[] { new Claim(ClaimTypes.Name, username) };
 
-        JwtSecurityToken token = new JwtSecurityToken(
-            issuer: "az",
-            audience: "movieapi",
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(10),
-            signingCredentials: cred
-        );
-        string tokenData = new JwtSecurityTokenHandler()
-                                            .WriteToken(token);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mnogosigurnaparola123456!@!@!@!@"));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        return tokenData;
+            var token = new JwtSecurityToken(
+                issuer: "StatusPageAPI",
+                audience: "StatusPageClient",
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(2), 
+                signingCredentials: creds
+            );
+
+            // 4. Turn it into a string
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

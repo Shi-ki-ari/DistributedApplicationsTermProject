@@ -1,5 +1,8 @@
-using StatusPageServices.ResponseDTO.Incidents;
+using StatusPageServices.RequestDTO;
 using StatusPageServices.RequestDTO.Incidents;
+using StatusPageServices.ResponseDTO;
+using StatusPageServices.ResponseDTO.Engineers;
+using StatusPageServices.ResponseDTO.Incidents;
 
 
 namespace StatusPageServices.Interfaces
@@ -11,5 +14,7 @@ namespace StatusPageServices.Interfaces
         Task<IncidentDto> CreateAsync(CreateIncidentDto dto);
         Task UpdateAsync(int id, UpdateIncidentDto dto);
         Task DeleteAsync(int id);
+
+        Task<PagedResult<IncidentDto>> GetPagedIncidentsAsync(PaginationQuery query);
     }
 }

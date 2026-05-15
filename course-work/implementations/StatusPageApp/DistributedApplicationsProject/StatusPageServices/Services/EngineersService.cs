@@ -1,11 +1,13 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using StatusPageData.Entities;
 using StatusPageRepo;
 using StatusPageServices.Interfaces;
+using StatusPageServices.RequestDTO;
 using StatusPageServices.RequestDTO.Engineers;
+using StatusPageServices.ResponseDTO;
 using StatusPageServices.ResponseDTO.Engineers;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace StatusPageServices.Services
 {
@@ -78,6 +80,35 @@ namespace StatusPageServices.Services
             entity.HourlyRate = dto.HourlyRate;
         }
 
+        //pagination and filtering
+        public async Task<PagedResult<EngineerDto>> GetPagedEngineersAsync(PaginationQuery query)
+        {
+            var allEngineers = await _repo.GetAllAsync();
 
+            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+            {
+                allEngineers = allEngineers.Where(e =>
+                    e.Name.Contains(query.SearchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            allEngineers = allEngineers.OrderBy(e => e.Name);
+
+            int totalCount = allEngineers.Count();
+
+            var pagedItems = allEngineers
+                .Skip((query.PageNumber - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(e => ToDto(e))
+                .ToList();
+
+            return new PagedResult<EngineerDto>
+            {
+                Items = pagedItems,
+                TotalCount = totalCount,
+                PageNumber = query.PageNumber,
+                PageSize = query.PageSize
+            };
+        }
     }
+
 }

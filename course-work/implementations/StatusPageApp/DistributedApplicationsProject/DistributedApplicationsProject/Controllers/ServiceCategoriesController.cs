@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StatusPageServices.Interfaces;
 using StatusPageServices.RequestDTO.ServiceCategories;
@@ -5,6 +6,7 @@ using StatusPageServices.ResponseDTO.ServiceCategories;
 
 namespace DistributedApplicationsProject.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ServiceCategoriesController : ControllerBase

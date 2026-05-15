@@ -41,7 +41,18 @@ namespace StatusPageData
                 .WithMany(u => u.Updates)
                 .HasForeignKey(i => i.IncidentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<UserEntity>().HasData(
+                new UserEntity
+                {
+                    Id = 1,
+                    Username = "admin",
+                    Password = "password123"
+                });
+
         }
+
 
     }
 }

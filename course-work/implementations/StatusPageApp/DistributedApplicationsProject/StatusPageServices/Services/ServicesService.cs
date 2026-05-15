@@ -1,11 +1,13 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using StatusPageData.Entities;
 using StatusPageRepo;
 using StatusPageServices.Interfaces;
+using StatusPageServices.RequestDTO;
 using StatusPageServices.RequestDTO.Services;
+using StatusPageServices.ResponseDTO;
 using StatusPageServices.ResponseDTO.Services;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace StatusPageServices.Services
 {
@@ -84,6 +86,37 @@ namespace StatusPageServices.Services
             entity.TargetUrl = dto.TargetUrl;
             entity.IsOnline = dto.IsOnline;
             entity.CategoryId = dto.CategoryId;
+        }
+
+
+        //pagination and filtering
+        public async Task<PagedResult<ServiceDto>> GetPagedServicesAsync(PaginationQuery query)
+        {
+            var allServices = await _repo.GetAllAsync();
+
+            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+            {
+                allServices = allServices.Where(s =>
+                    s.Name.Contains(query.SearchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            allServices = allServices.OrderBy(s => s.Name);
+
+            int totalCount = allServices.Count();
+
+            var pagedItems = allServices
+                .Skip((query.PageNumber - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(s => ToDto(s))
+                .ToList();
+
+            return new PagedResult<ServiceDto>
+            {
+                Items = pagedItems,
+                TotalCount = totalCount,
+                PageNumber = query.PageNumber,
+                PageSize = query.PageSize
+            };
         }
 
     }

@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using StatusPageServices.Interfaces;
+using StatusPageServices.RequestDTO;
 using StatusPageServices.RequestDTO.Incidents;
 using StatusPageServices.ResponseDTO.Incidents;
 
 namespace DistributedApplicationsProject.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class IncidentsController : ControllerBase
@@ -18,10 +21,9 @@ namespace DistributedApplicationsProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetUpdatesForIncident(int incidentId, [FromQuery] PaginationQuery query)
         {
-            var result = await _incidentsService.GetAllAsync();
-            return Ok(result);
+            return Ok(await _incidentsService.GetPagedIncidentsAsync(query));
         }
 
         [HttpGet("{id}")]
