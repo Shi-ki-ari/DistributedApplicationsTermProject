@@ -58,13 +58,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters()
+        options.TokenValidationParameters = new TokenValidationParameters
         {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
             ValidIssuer = "StatusPageAPI",
             ValidAudience = "StatusPageClient",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mnogosigurnaparola123456!@!@!@!@")), 
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mnogosigurnaparola123456!@!@!@!@")),
+            ClockSkew = TimeSpan.Zero
         };
     });
+builder.Services.AddAuthorization();
 
 // Connection string
 var connectionString = builder.Configuration.GetConnectionString("StatusPageDb");
@@ -96,6 +102,10 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Serve static files from wwwroot (dashboard HTML/CSS/JS)
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.MapControllers();
 

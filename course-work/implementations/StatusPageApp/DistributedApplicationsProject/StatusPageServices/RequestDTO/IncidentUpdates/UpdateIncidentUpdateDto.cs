@@ -6,7 +6,6 @@ namespace StatusPageServices.RequestDTO.IncidentUpdates
         int Id,
         string Message,
         string UpdateStatus,
-        bool IsSystemGenerated,
         int IncidentId,
         int EngineerId
     );

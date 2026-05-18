@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StatusPageData.Entities;
-using StatusPageData.Entities.StatusPageData.Entities;
 
 namespace StatusPageData
 {

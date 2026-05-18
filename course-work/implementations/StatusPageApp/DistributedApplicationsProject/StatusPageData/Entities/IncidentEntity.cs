@@ -17,15 +17,17 @@ namespace StatusPageData.Entities
 
         public bool IsScheduled { get; set; }
 
+        public bool IsSystemGenerated { get; set; }
+
         public int ServiceId { get; set; }
 
-        public int AssignedEngineerId { get; set; }
+        public int? AssignedEngineerId { get; set; }
 
         // Navigation properties
 
         public ServiceEntity Service { get; set; } = null!;
 
-        public EngineerEntity AssignedEngineer { get; set; } = null!;
+        public EngineerEntity? AssignedEngineer { get; set; }
 
         public ICollection<IncidentUpdateEntity> Updates { get; set; } = new List<IncidentUpdateEntity>();
     }

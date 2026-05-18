@@ -7,7 +7,6 @@ namespace StatusPageServices.ResponseDTO.IncidentUpdates
         string Message,
         DateTime PostedAt,
         string UpdateStatus,
-        bool IsSystemGenerated,
         int IncidentId,
         int EngineerId
     );

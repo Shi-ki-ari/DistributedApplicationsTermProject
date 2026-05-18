@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StatusPage Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body, html { height: 100%; }
+    #login-card { max-width: 420px; }
+    .view { display: none; }
+    .active-view { display: block; }
+    .pointer { cursor: pointer; }
+    .nowrap { white-space: nowrap; }
+  </style>
+</head>
+<body class="bg-light">
+  <!-- Login -->
+  <div id="login-screen" class="d-flex align-items-center justify-content-center vh-100">
+    <div id="login-card" class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="card-title mb-3">Admin Login</h4>
+        <div id="login-alert" class="alert alert-danger d-none" role="alert"></div>
+        <form id="login-form" class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Username</label>
+            <input id="username" class="form-control" required />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Password</label>
+            <input id="password" type="password" class="form-control" required />
+          </div>
+          <div class="col-12 d-flex justify-content-end">
+            <button id="login-btn" type="submit" class="btn btn-primary">Sign in</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main dashboard -->
+  <div id="app" class="d-flex flex-column vh-100" style="display:none;">
+    <!-- Top nav -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">StatusPage Admin</a>
+        <div class="d-flex align-items-center">
+          <ul class="nav nav-tabs me-3" id="mainTabs">
+            <li class="nav-item"><a class="nav-link active pointer" data-view="engineers">Engineers</a></li>
+            <li class="nav-item"><a class="nav-link pointer" data-view="services">Services</a></li>
+            <li class="nav-item"><a class="nav-link pointer" data-view="incidents">Incidents</a></li>
+          </ul>
+          <button id="logout-btn" class="btn btn-outline-light btn-sm">Logout</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Content area -->
+    <main class="container-fluid p-4 overflow-auto">
+      <!-- Engineers View -->
+      <section id="engineers" class="view active-view">
+        <div class="d-flex justify-content-between mb-2">
+          <div class="input-group w-50">
+            <input id="engineers-search" class="form-control" placeholder="Search engineers..." />
+            <button id="engineers-search-btn" class="btn btn-outline-secondary">Search</button>
+          </div>
+          <div class="text-muted align-self-center">Page size: <span id="engineers-pagesize-text">5</span></div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Hired Date</th>
+                <th>On Call</th>
+                <th>Hourly Rate</th>
+              </tr>
+            </thead>
+            <tbody id="engineers-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <button id="engineers-prev" class="btn btn-sm btn-outline-primary">Previous</button>
+            <button id="engineers-next" class="btn btn-sm btn-outline-primary">Next</button>
+          </div>
+          <div class="text-muted">Page <span id="engineers-page-text">1</span> of <span id="engineers-totalpages-text">1</span></div>
+        </div>
+      </section>
+
+      <!-- Services View -->
+      <section id="services" class="view">
+        <div class="d-flex justify-content-between mb-2">
+          <div class="input-group w-50">
+            <input id="services-search" class="form-control" placeholder="Search services..." />
+            <button id="services-search-btn" class="btn btn-outline-secondary">Search</button>
+          </div>
+          <div class="text-muted align-self-center">Page size: <span id="services-pagesize-text">5</span></div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Target URL</th>
+                <th>Is Online</th>
+                <th>Date Added</th>
+                <th>Uptime %</th>
+                <th>Category ID</th>
+              </tr>
+            </thead>
+            <tbody id="services-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <button id="services-prev" class="btn btn-sm btn-outline-primary">Previous</button>
+            <button id="services-next" class="btn btn-sm btn-outline-primary">Next</button>
+          </div>
+          <div class="text-muted">Page <span id="services-page-text">1</span> of <span id="services-totalpages-text">1</span></div>
+        </div>
+      </section>
+
+      <!-- Incidents View -->
+      <section id="incidents" class="view">
+        <div class="d-flex justify-content-between mb-2">
+          <div class="input-group w-50">
+            <input id="incidents-search" class="form-control" placeholder="Search incidents..." />
+            <button id="incidents-search-btn" class="btn btn-outline-secondary">Search</button>
+          </div>
+          <div class="text-muted align-self-center">Page size: <span id="incidents-pagesize-text">5</span></div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Is Scheduled</th>
+                <th>Service ID</th>
+                <th>Assigned Engineer ID</th>
+                <th class="nowrap">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="incidents-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <button id="incidents-prev" class="btn btn-sm btn-outline-primary">Previous</button>
+            <button id="incidents-next" class="btn btn-sm btn-outline-primary">Next</button>
+          </div>
+          <div class="text-muted">Page <span id="incidents-page-text">1</span> of <span id="incidents-totalpages-text">1</span></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Incident Updates Modal -->
+  <div class="modal fade" id="updatesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="updatesModalTitle" class="modal-title">Incident Updates</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="updates-loading" class="text-center my-3 d-none">Loading...</div>
+          <div id="updates-empty" class="text-muted d-none">No updates found.</div>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Message</th>
+                  <th>Posted At</th>
+                  <th>Status</th>
+                  <th>System?</th>
+                  <th>Engineer ID</th>
+                </tr>
+              </thead>
+              <tbody id="updates-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap bundle (includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Base API root (relative)
+    const API_ROOT = '/api';
+
+    // Token management
+    function setToken(t) { localStorage.setItem('jwt', t); }
+    function getToken() { return localStorage.getItem('jwt'); }
+    function clearToken() { localStorage.removeItem('jwt'); }
+
+    const loginScreen = document.getElementById('login-screen');
+    const appRoot = document.getElementById('app');
+
+    // Utility: auth headers
+    function authHeaders() {
+      const token = getToken();
+      return token ? { 'Authorization': 'Bearer ' + token } : {};
+    }
+
+    // Generic fetch wrapper for paged endpoints
+    async function fetchPaged(path, pageNumber = 1, pageSize = 5, search = '') {
+      const params = new URLSearchParams();
+      params.set('PageNumber', pageNumber);
+      params.set('PageSize', pageSize);
+      if (search) params.set('SearchTerm', search);
+      const url = `${API_ROOT}/${path}?${params.toString()}`;
+      const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      });
+      if (res.status === 401) throw new Error('unauthorized');
+      if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+      return await res.json();
+    }
+
+    // Incident updates fetch (all) then filter locally by incidentId
+    async function fetchIncidentUpdatesFor(incidentId) {
+      const url = `${API_ROOT}/incidentupdates`;
+      const res = await fetch(url, { headers: { 'Content-Type': 'application/json', ...authHeaders() } });
+      if (res.status === 401) throw new Error('unauthorized');
+      if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+      const all = await res.json();
+      return all.filter(u => u.incidentId === incidentId || u.IncidentId === incidentId);
+    }
+
+    // --- State for each view
+    const state = {
+      engineers: { page: 1, pageSize: 5, search: '', totalPages: 1 },
+      services: { page: 1, pageSize: 5, search: '', totalPages: 1 },
+      incidents: { page: 1, pageSize: 5, search: '', totalPages: 1 }
+    };
+
+    // Formatters
+    function fmtDateISO(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr;
+      return d.toLocaleString();
+    }
+    function boolText(v){ return v ? 'Yes' : 'No'; }
+
+    // Renderers
+    async function loadEngineers() {
+      const s = state.engineers;
+      try {
+        const data = await fetchPaged('engineers', s.page, s.pageSize, s.search);
+        const items = data.items || data.Items || [];
+        const totalCount = data.totalCount ?? data.TotalCount ?? 0;
+        const pageSize = data.pageSize ?? data.PageSize ?? s.pageSize;
+        const pageNumber = data.pageNumber ?? data.PageNumber ?? s.page;
+        const totalPages = data.totalPages ?? Math.max(1, Math.ceil(totalCount / pageSize));
+        s.totalPages = totalPages;
+
+        const tbody = document.getElementById('engineers-tbody');
+        tbody.innerHTML = '';
+        items.forEach(e => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${e.id ?? e.Id}</td>
+            <td>${e.name ?? e.Name}</td>
+            <td>${e.email ?? e.Email}</td>
+            <td>${fmtDateISO(e.hiredDate ?? e.HiredDate)}</td>
+            <td>${boolText(e.onCall ?? e.OnCall)}</td>
+            <td>${(e.hourlyRate ?? e.HourlyRate ?? '').toString()}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById('engineers-page-text').textContent = pageNumber;
+        document.getElementById('engineers-totalpages-text').textContent = totalPages;
+        document.getElementById('engineers-pagesize-text').textContent = pageSize;
+        document.getElementById('engineers-prev').disabled = pageNumber <= 1;
+        document.getElementById('engineers-next').disabled = pageNumber >= totalPages;
+      } catch (err) {
+        handleFetchError(err);
+      }
+    }
+
+    async function loadServices() {
+      const s = state.services;
+      try {
+        const data = await fetchPaged('services', s.page, s.pageSize, s.search);
+        const items = data.items || data.Items || [];
+        const totalCount = data.totalCount ?? data.TotalCount ?? 0;
+        const pageSize = data.pageSize ?? data.PageSize ?? s.pageSize;
+        const pageNumber = data.pageNumber ?? data.PageNumber ?? s.page;
+        const totalPages = data.totalPages ?? Math.max(1, Math.ceil(totalCount / pageSize));
+        s.totalPages = totalPages;
+
+        const tbody = document.getElementById('services-tbody');
+        tbody.innerHTML = '';
+        items.forEach(e => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${e.id ?? e.Id}</td>
+            <td>${e.name ?? e.Name}</td>
+            <td><a href="${e.targetUrl ?? e.TargetUrl}" target="_blank" rel="noopener">${e.targetUrl ?? e.TargetUrl}</a></td>
+            <td>${boolText(e.isOnline ?? e.IsOnline)}</td>
+            <td>${fmtDateISO(e.dateAdded ?? e.DateAdded)}</td>
+            <td>${(e.uptimePercentage ?? e.UptimePercentage ?? '').toString()}</td>
+            <td>${e.categoryId ?? e.CategoryId}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById('services-page-text').textContent = pageNumber;
+        document.getElementById('services-totalpages-text').textContent = totalPages;
+        document.getElementById('services-pagesize-text').textContent = pageSize;
+        document.getElementById('services-prev').disabled = pageNumber <= 1;
+        document.getElementById('services-next').disabled = pageNumber >= totalPages;
+      } catch (err) {
+        handleFetchError(err);
+      }
+    }
+
+    async function loadIncidents() {
+      const s = state.incidents;
+      try {
+        const data = await fetchPaged('incidents', s.page, s.pageSize, s.search);
+        const items = data.items || data.Items || [];
+        const totalCount = data.totalCount ?? data.TotalCount ?? 0;
+        const pageSize = data.pageSize ?? data.PageSize ?? s.pageSize;
+        const pageNumber = data.pageNumber ?? data.PageNumber ?? s.page;
+        const totalPages = data.totalPages ?? Math.max(1, Math.ceil(totalCount / pageSize));
+        s.totalPages = totalPages;
+
+        const tbody = document.getElementById('incidents-tbody');
+        tbody.innerHTML = '';
+        items.forEach(e => {
+          const id = e.id ?? e.Id;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${id}</td>
+            <td>${escapeHtml(e.title ?? e.Title)}</td>
+            <td>${escapeHtml(e.description ?? e.Description)}</td>
+            <td>${fmtDateISO(e.startTime ?? e.StartTime)}</td>
+            <td>${fmtDateISO(e.endTime ?? e.EndTime)}</td>
+            <td>${boolText(e.isScheduled ?? e.IsScheduled)}</td>
+            <td>${e.serviceId ?? e.ServiceId}</td>
+            <td>${e.assignedEngineerId ?? e.AssignedEngineerId ?? ''}</td>
+            <td class="nowrap">
+              <button data-id="${id}" class="btn btn-sm btn-outline-primary view-updates-btn">View Updates</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById('incidents-page-text').textContent = pageNumber;
+        document.getElementById('incidents-totalpages-text').textContent = totalPages;
+        document.getElementById('incidents-pagesize-text').textContent = pageSize;
+        document.getElementById('incidents-prev').disabled = pageNumber <= 1;
+        document.getElementById('incidents-next').disabled = pageNumber >= totalPages;
+
+        // attach view updates handlers
+        document.querySelectorAll('.view-updates-btn').forEach(btn => {
+          btn.addEventListener('click', async (ev) => {
+            const id = parseInt(btn.getAttribute('data-id'), 10);
+            await showUpdatesModal(id);
+          });
+        });
+      } catch (err) {
+        handleFetchError(err);
+      }
+    }
+
+    // Show updates modal
+    let updatesModal;
+    async function showUpdatesModal(incidentId) {
+      const titleEl = document.getElementById('updatesModalTitle');
+      const tbody = document.getElementById('updates-tbody');
+      const loading = document.getElementById('updates-loading');
+      const empty = document.getElementById('updates-empty');
+      titleEl.textContent = `Incident ${incidentId} Updates`;
+      tbody.innerHTML = '';
+      empty.classList.add('d-none');
+      loading.classList.remove('d-none');
+
+      try {
+        const updates = await fetchIncidentUpdatesFor(incidentId);
+        loading.classList.add('d-none');
+        if (!updates.length) {
+          empty.classList.remove('d-none');
+        } else {
+          updates.forEach(u => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${u.id ?? u.Id}</td>
+              <td>${escapeHtml(u.message ?? u.Message)}</td>
+              <td>${fmtDateISO(u.postedAt ?? u.PostedAt)}</td>
+              <td>${escapeHtml(u.updateStatus ?? u.UpdateStatus)}</td>
+              <td>${boolText(u.isSystemGenerated ?? u.IsSystemGenerated)}</td>
+              <td>${u.engineerId ?? u.EngineerId}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (err) {
+        loading.classList.add('d-none');
+        tbody.innerHTML = '<tr><td colspan="6" class="text-danger">Failed to load updates</td></tr>';
+      }
+
+      if (!updatesModal) updatesModal = new bootstrap.Modal(document.getElementById('updatesModal'));
+      updatesModal.show();
+    }
+
+    // Escape helper for safety
+    function escapeHtml(s) {
+      if (s === null || s === undefined) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Login flow
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await login();
+    });
+
+    async function login() {
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value;
+      const alertEl = document.getElementById('login-alert');
+      alertEl.classList.add('d-none');
+
+      try {
+        const res = await fetch(API_ROOT + '/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+        });
+        if (!res.ok) {
+          const txt = await res.text();
+          alertEl.textContent = txt || 'Login failed';
+          alertEl.classList.remove('d-none');
+          return;
+        }
+        const json = await res.json();
+        const token = json.token ?? json.Token;
+        if (!token) {
+          alertEl.textContent = 'No token received';
+          alertEl.classList.remove('d-none');
+          return;
+        }
+        setToken(token);
+        showApp();
+      } catch (err) {
+        alertEl.textContent = 'Network error';
+        alertEl.classList.remove('d-none');
+      }
+    }
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      clearToken();
+      window.location.reload();
+    });
+
+    function showLoginScreen() {
+      loginScreen.classList.add('d-flex');
+      loginScreen.style.display = 'flex';
+      appRoot.style.display = 'none';
+    }
+
+    // Show main app & load first view
+    function showApp() {
+      loginScreen.classList.remove('d-flex');
+      loginScreen.style.display = 'none';
+      appRoot.style.display = 'flex';
+      // load current active tab (default engineers)
+      renderActiveView();
+    }
+
+    // Navigation
+    document.querySelectorAll('#mainTabs .nav-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        document.querySelectorAll('#mainTabs .nav-link').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        const view = link.getAttribute('data-view');
+        switchView(view);
+      });
+    });
+
+    function switchView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
+      document.getElementById(viewId).classList.add('active-view');
+      // reset search box focus for UX
+      const box = document.querySelector(`#${viewId} input`);
+      if (box) box.focus();
+      renderActiveView();
+    }
+
+    function renderActiveView() {
+      const activeTab = document.querySelector('#mainTabs .nav-link.active');
+      const view = activeTab ? activeTab.getAttribute('data-view') : 'engineers';
+      if (view === 'engineers') loadEngineers();
+      else if (view === 'services') loadServices();
+      else if (view === 'incidents') loadIncidents();
+    }
+
+    // Search and pagination handlers
+    document.getElementById('engineers-search-btn').addEventListener('click', () => {
+      state.engineers.search = document.getElementById('engineers-search').value.trim();
+      state.engineers.page = 1;
+      loadEngineers();
+    });
+    document.getElementById('services-search-btn').addEventListener('click', () => {
+      state.services.search = document.getElementById('services-search').value.trim();
+      state.services.page = 1;
+      loadServices();
+    });
+    document.getElementById('incidents-search-btn').addEventListener('click', () => {
+      state.incidents.search = document.getElementById('incidents-search').value.trim();
+      state.incidents.page = 1;
+      loadIncidents();
+    });
+
+    document.getElementById('engineers-prev').addEventListener('click', () => {
+      if (state.engineers.page > 1) { state.engineers.page--; loadEngineers(); }
+    });
+    document.getElementById('engineers-next').addEventListener('click', () => {
+      if (state.engineers.page < state.engineers.totalPages) { state.engineers.page++; loadEngineers(); }
+    });
+
+    document.getElementById('services-prev').addEventListener('click', () => {
+      if (state.services.page > 1) { state.services.page--; loadServices(); }
+    });
+    document.getElementById('services-next').addEventListener('click', () => {
+      if (state.services.page < state.services.totalPages) { state.services.page++; loadServices(); }
+    });
+
+    document.getElementById('incidents-prev').addEventListener('click', () => {
+      if (state.incidents.page > 1) { state.incidents.page--; loadIncidents(); }
+    });
+    document.getElementById('incidents-next').addEventListener('click', () => {
+      if (state.incidents.page < state.incidents.totalPages) { state.incidents.page++; loadIncidents(); }
+    });
+
+    // Shortcut: Enter triggers search in inputs
+    ['engineers-search', 'services-search', 'incidents-search'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') document.getElementById(id.replace('-search','-search-btn')).click();
+      });
+    });
+
+    // Handle fetch errors (unauthorized -> show login)
+    function handleFetchError(err) {
+      if (!err) return;
+      if (err.message && err.message.toLowerCase().includes('unauthorized')) {
+        clearToken();
+        // show login again
+        showLoginScreen();
+        document.getElementById('login-alert').classList.add('d-none');
+      } else {
+        console.error(err);
+        // optionally show a toast or console
+      }
+    }
+
+    // Initialize: If token exists, show app else show login
+    (function init() {
+      const token = getToken();
+      if (token) {
+        showApp();
+      } else {
+        showLoginScreen();
+      }
+    })();
+  </script>
+</body>
+</html>

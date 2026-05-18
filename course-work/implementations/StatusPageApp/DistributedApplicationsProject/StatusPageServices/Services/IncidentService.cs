@@ -60,8 +60,9 @@ namespace StatusPageServices.Services
                 StartTime = dto.StartTime,
                 EndTime = dto.EndTime,
                 IsScheduled = dto.IsScheduled,
+                IsSystemGenerated = dto.IsSystemGenerated,
                 ServiceId = dto.ServiceId,
-                AssignedEngineerId = dto.AssignedEngineerId ?? 0
+                AssignedEngineerId = dto.AssignedEngineerId
             };
         }
 
@@ -74,8 +75,9 @@ namespace StatusPageServices.Services
                 entity.StartTime,
                 entity.EndTime,
                 entity.IsScheduled,
+                entity.IsSystemGenerated,
                 entity.ServiceId,
-                entity.AssignedEngineerId == 0 ? null : (int?)entity.AssignedEngineerId
+                entity.AssignedEngineerId
             );
         }
 
@@ -85,8 +87,9 @@ namespace StatusPageServices.Services
             entity.StartTime = dto.StartTime;
             entity.EndTime = dto.EndTime;
             entity.IsScheduled = dto.IsScheduled;
+            entity.IsSystemGenerated = dto.IsSystemGenerated;
             entity.ServiceId = dto.ServiceId;
-            entity.AssignedEngineerId = dto.AssignedEngineerId ?? 0;
+            entity.AssignedEngineerId = dto.AssignedEngineerId;
         }
 
         public async Task<PagedResult<IncidentDto>> GetPagedIncidentsAsync(PaginationQuery query)
@@ -108,7 +111,7 @@ namespace StatusPageServices.Services
             var pagedItems = allIncidents
                 .Skip((query.PageNumber - 1) * query.PageSize)
                 .Take(query.PageSize)
-                .Select(i => new IncidentDto(i.Id, i.Title, i.Description, i.StartTime, i.EndTime, i.IsScheduled, i.ServiceId, i.AssignedEngineerId == 0 ? null : (int?)i.AssignedEngineerId))
+                .Select(i => new IncidentDto(i.Id, i.Title, i.Description, i.StartTime, i.EndTime, i.IsScheduled, i.IsSystemGenerated, i.ServiceId, i.AssignedEngineerId))
                 .ToList();
 
             return new PagedResult<IncidentDto>

@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
+using System.Diagnostics;
+using System.Net.Http;
 using System.Threading.Tasks;
 using StatusPageData.Entities;
 using StatusPageRepo;
@@ -15,10 +16,12 @@ namespace StatusPageServices.Services
     public class ServiceChecksService : BaseService<ServiceCheckEntity>, IServiceChecksService
     {
         private readonly IRepo<StatusPageData.Entities.ServiceEntity> _servicesRepo;
+        private readonly IRepo<IncidentEntity> _incidentsRepo;
 
-        public ServiceChecksService(IRepo<ServiceCheckEntity> checksRepo, IRepo<StatusPageData.Entities.ServiceEntity> servicesRepo) : base(checksRepo)
+        public ServiceChecksService(IRepo<ServiceCheckEntity> checksRepo, IRepo<StatusPageData.Entities.ServiceEntity> servicesRepo, IRepo<IncidentEntity> incidentsRepo) : base(checksRepo)
         {
             _servicesRepo = servicesRepo;
+            _incidentsRepo = incidentsRepo;
         }
 
         public async Task<IEnumerable<ServiceCheckDto>> GetAllAsync()
@@ -53,6 +56,7 @@ namespace StatusPageServices.Services
         {
             //get all services
             var servicesToPing = await _servicesRepo.GetAllAsync();
+            var servicesById = servicesToPing.ToDictionary(service => service.Id);
 
             //ping them in parallel
             var resultsList = await Task.WhenAll(servicesToPing.Select(ProbeServiceAsync));
@@ -62,52 +66,71 @@ namespace StatusPageServices.Services
             foreach (var check in resultsList)
             {
                 await AddEntityAsync(check);
+
+                if (!check.IsHealthy)
+                {
+                    servicesById.TryGetValue(check.ServiceId, out var service);
+                    var title = service is null
+                        ? "Service check failed"
+                        : $"Service check failed: {service.Name}";
+                    var description = string.IsNullOrWhiteSpace(check.ErrorMessage)
+                        ? "Service health check failed."
+                        : check.ErrorMessage;
+
+                    var incident = new IncidentEntity
+                    {
+                        Title = title,
+                        Description = description,
+                        StartTime = check.CheckedAt,
+                        EndTime = null,
+                        IsScheduled = false,
+                        IsSystemGenerated = true,
+                        ServiceId = check.ServiceId,
+                        AssignedEngineerId = null
+                    };
+
+                    await _incidentsRepo.AddAsync(incident);
+                }
             }
             return resultsList.Select(ToDto);
         }
 
-        private static async Task<ServiceCheckEntity> ProbeServiceAsync(StatusPageData.Entities.ServiceEntity service)
+        private static readonly HttpClient HttpClient = new HttpClient();
+
+        private static async Task<ServiceCheckEntity> ProbeServiceAsync(ServiceEntity service)
         {
-            var target = TryGetPingTarget(service.TargetUrl);
             var check = new ServiceCheckEntity
             {
                 ServiceId = service.Id,
                 CheckedAt = DateTime.UtcNow
             };
 
-            if (target is null)
+            if (!Uri.TryCreate(service.TargetUrl, UriKind.Absolute, out var target))
             {
                 check.IsHealthy = false;
                 check.ErrorMessage = "Invalid service URL.";
                 return check;
             }
 
-            using var ping = new Ping();
+            var stopwatch = Stopwatch.StartNew();
             try
             {
-                var reply = await ping.SendPingAsync(target, 5000);
-       check.IsHealthy = reply.Status == IPStatus.Success;
-                check.ResponseTimeMs = (int)reply.RoundtripTime;
-                check.StatusCode = null;
-                check.ErrorMessage = check.IsHealthy ? null : reply.Status.ToString();
+                using var response = await HttpClient.GetAsync(target);
+                stopwatch.Stop();
+                check.IsHealthy = response.IsSuccessStatusCode;
+                check.ResponseTimeMs = (int)stopwatch.ElapsedMilliseconds;
+                check.StatusCode = (int)response.StatusCode;
+                check.ErrorMessage = response.IsSuccessStatusCode ? null : response.ReasonPhrase;
             }
             catch (Exception ex)
             {
+                stopwatch.Stop();
                 check.IsHealthy = false;
+                check.ResponseTimeMs = (int)stopwatch.ElapsedMilliseconds;
                 check.ErrorMessage = ex.Message;
             }
 
             return check;
-        }
-
-        private static string? TryGetPingTarget(string targetUrl)
-        {
-            if (Uri.TryCreate(targetUrl, UriKind.Absolute, out var uri) && !string.IsNullOrWhiteSpace(uri.Host))
-            {
-                return uri.Host;
-            }
-
-            return string.IsNullOrWhiteSpace(targetUrl) ? null : targetUrl;
         }
 
         private static ServiceCheckDto ToDto(ServiceCheckEntity entity)

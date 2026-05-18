@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StatusPageServices.Services;
+using StatusPageServices.Interfaces;
 
 namespace StatusPageAPI.Controllers
 {
@@ -8,23 +9,27 @@ namespace StatusPageAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly TokenService _tokenService;
+        private readonly IUserService _userService;
 
-        public AuthController(TokenService tokenService)
+        public AuthController(TokenService tokenService, IUserService userService)
         {
             _tokenService = tokenService;
+            _userService = userService;
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            if (request.Username == "admin" && request.Password == "password123")
-            {
-                // If they match, print the VIP pass!
-                string token = _tokenService.CreateSimpleToken(request.Username);
-                return Ok(new { Token = token });
-            }
+            // Try to find user in Users table (seeded admin user expected)
+            var user = await _userService.FindByUsernameAsync(request.Username);
+            if (user is null) return Unauthorized("Invalid username or password");
 
-            return Unauthorized("Invalid username or password");
+            // Verify password (Note: currently plain-text comparison)
+            if (!_userService.VerifyPassword(request.Password, user.Password))
+                return Unauthorized("Invalid username or password");
+
+            var token = _tokenService.CreateSimpleToken(request.Username);
+            return Ok(new { Token = token });
         }
     }
 

@@ -1,4 +1,4 @@
-﻿using StatusPageData.Entities.StatusPageData.Entities;
+﻿using StatusPageData.Entities;
 using StatusPageRepo;
 using StatusPageServices.Interfaces;
 using StatusPageServices.RequestDTO.Users.StatusPageServices.RequestDTO.Users;
@@ -19,6 +19,12 @@ namespace StatusPageServices.Services
         public async Task<UserEntity?> FindByUsernameAsync(string username)
         {
             return (await _repo.GetAllAsync()).FirstOrDefault(u => u.Username == username);
+        }
+
+        public async Task<bool> UsernameExistsAsync(string username)
+        {
+            return (await _repo.GetAllAsync())
+                .Any(u => string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase));
         }
 
         public bool VerifyPassword(string inputPassword, string storedPassword)

@@ -9,6 +9,7 @@ namespace StatusPageServices.RequestDTO.Incidents
         DateTime? EndTime,
         bool IsScheduled,
         int ServiceId,
-        int? AssignedEngineerId
+        int? AssignedEngineerId,
+        bool IsSystemGenerated = false
     );
 }

@@ -21,7 +21,7 @@ namespace DistributedApplicationsProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUpdatesForIncident(int incidentId, [FromQuery] PaginationQuery query)
+        public async Task<IActionResult> GetUpdatesForIncident([FromQuery] PaginationQuery query)
         {
             return Ok(await _incidentsService.GetPagedIncidentsAsync(query));
         }

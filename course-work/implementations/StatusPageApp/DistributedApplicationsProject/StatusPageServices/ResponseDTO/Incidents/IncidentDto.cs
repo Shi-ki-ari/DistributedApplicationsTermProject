@@ -9,6 +9,7 @@ namespace StatusPageServices.ResponseDTO.Incidents
         DateTime StartTime,
         DateTime? EndTime,
         bool IsScheduled,
+        bool IsSystemGenerated,
         int ServiceId,
         int? AssignedEngineerId
     );

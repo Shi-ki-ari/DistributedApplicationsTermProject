@@ -59,7 +59,6 @@ namespace StatusPageServices.Services
                 Message = dto.Message,
                 PostedAt = System.DateTime.UtcNow,
                 UpdateStatus = dto.UpdateStatus,
-                IsSystemGenerated = dto.IsSystemGenerated,
                 IncidentId = dto.IncidentId,
                 EngineerId = dto.EngineerId
             };
@@ -72,7 +71,6 @@ namespace StatusPageServices.Services
                 entity.Message,
                 entity.PostedAt,
                 entity.UpdateStatus,
-                entity.IsSystemGenerated,
                 entity.IncidentId,
                 entity.EngineerId
             );
@@ -82,7 +80,6 @@ namespace StatusPageServices.Services
         {
             entity.Message = dto.Message;
             entity.UpdateStatus = dto.UpdateStatus;
-            entity.IsSystemGenerated = dto.IsSystemGenerated;
             entity.IncidentId = dto.IncidentId;
             entity.EngineerId = dto.EngineerId;
         }

@@ -14,8 +14,6 @@ namespace StatusPageData.Entities
 
         public required string UpdateStatus { get;set; }
 
-        public bool IsSystemGenerated { get; set; }
-
         public int IncidentId { get; set; }
 
         public int EngineerId { get; set; }

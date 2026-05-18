@@ -6,7 +6,6 @@ using StatusPageServices.Services;
 
 namespace StatusPageAPI.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
@@ -28,6 +27,11 @@ namespace StatusPageAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
         {
+            if (await _userService.UsernameExistsAsync(dto.Username))
+            {
+                return Conflict("Username already exists");
+            }
+
             var created = await _userService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
