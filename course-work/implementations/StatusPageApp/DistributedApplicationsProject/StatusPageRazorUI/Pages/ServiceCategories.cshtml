@@ -1,0 +1,149 @@
+@page
+@model StatusPageRazorUI.Pages.ServiceCategoriesModel
+
+<h1 class="mb-4">Service Categories</h1>
+
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+        Add Category
+    </button>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-6">
+        <input class="form-control" name="SearchTerm" value="@Model.SearchTerm" placeholder="Search categories..." />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Display Order</th>
+            <th>Notify</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Categories.Items.Any())
+        {
+            foreach (var category in Model.Categories.Items)
+            {
+                <tr>
+                    <td>@category.Id</td>
+                    <td>@category.Name</td>
+                    <td>@category.DisplayOrder</td>
+                    <td>@(category.Notify ? "Yes" : "No")</td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#categoryDetails-@category.Id">
+                            View
+                        </button>
+                        <form method="post" asp-page-handler="Delete" class="d-inline">
+                            <input type="hidden" name="id" value="@category.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center">No categories found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.Categories.Items.Any())
+{
+    foreach (var category in Model.Categories.Items)
+    {
+        <div class="modal fade" id="categoryDetails-@category.Id" tabindex="-1" aria-labelledby="categoryDetailsLabel-@category.Id" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="categoryDetailsLabel-@category.Id">Category Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Name</dt>
+                            <dd class="col-sm-8">@category.Name</dd>
+                            <dt class="col-sm-4">Description</dt>
+                            <dd class="col-sm-8">@category.Description</dd>
+                            <dt class="col-sm-4">Display Order</dt>
+                            <dd class="col-sm-8">@category.DisplayOrder</dd>
+                            <dt class="col-sm-4">Notify</dt>
+                            <dd class="col-sm-8">@(category.Notify ? "Yes" : "No")</dd>
+                            <dt class="col-sm-4">Created</dt>
+                            <dd class="col-sm-8">@category.CreatedAt.ToString("yyyy-MM-dd")</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="Create">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="categoryName" class="form-label">Name</label>
+                        <input id="categoryName" name="name" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="categoryDescription" class="form-label">Description</label>
+                        <textarea id="categoryDescription" name="description" class="form-control"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="categoryDisplayOrder" class="form-label">Display Order</label>
+                        <input id="categoryDisplayOrder" name="displayOrder" type="number" class="form-control" value="0" />
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input id="categoryNotify" name="notify" type="checkbox" class="form-check-input" value="true" />
+                        <label class="form-check-label" for="categoryNotify">Notify</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<nav aria-label="Service categories pagination">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : string.Empty)">
+            <a class="page-link"
+               asp-page="/ServiceCategories"
+               asp-route-PageNumber="@(Model.PageNumber - 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.SearchTerm">Previous</a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">Page @Model.PageNumber of @Model.Categories.TotalPages</span>
+        </li>
+        <li class="page-item @(Model.PageNumber >= Model.Categories.TotalPages ? "disabled" : string.Empty)">
+            <a class="page-link"
+               asp-page="/ServiceCategories"
+               asp-route-PageNumber="@(Model.PageNumber + 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.SearchTerm">Next</a>
+        </li>
+    </ul>
+</nav>

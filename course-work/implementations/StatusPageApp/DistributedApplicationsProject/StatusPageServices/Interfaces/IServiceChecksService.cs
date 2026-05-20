@@ -10,6 +10,7 @@ namespace StatusPageServices.Interfaces
         Task<IEnumerable<ServiceCheckDto>> GetAllAsync();
         Task<ServiceCheckDto?> GetByIdAsync(int id);
         Task<ServiceCheckDto> CreateAsync(CreateServiceCheckDto dto);
+        Task DeleteAsync(int id);
         Task<IEnumerable<ServiceCheckDto>> ExecuteSweepAsync();
     }
 }

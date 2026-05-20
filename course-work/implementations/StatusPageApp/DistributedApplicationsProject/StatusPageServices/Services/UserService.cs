@@ -21,6 +21,12 @@ namespace StatusPageServices.Services
             return (await _repo.GetAllAsync()).FirstOrDefault(u => u.Username == username);
         }
 
+        public async Task<IEnumerable<UserDto>> GetAllAsync()
+        {
+            var entities = await GetAllEntityAsync();
+            return entities.Select(ToDto);
+        }
+
         public async Task<bool> UsernameExistsAsync(string username)
         {
             return (await _repo.GetAllAsync())

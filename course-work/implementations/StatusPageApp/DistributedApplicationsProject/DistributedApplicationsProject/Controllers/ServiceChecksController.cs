@@ -39,5 +39,12 @@ namespace DistributedApplicationsProject.Controllers
             var created = await _serviceChecksService.ExecuteSweepAsync();
             return Ok(created);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _serviceChecksService.DeleteAsync(id);
+            return NoContent();
+        }
     }
 }

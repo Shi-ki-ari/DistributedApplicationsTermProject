@@ -13,6 +13,7 @@ namespace StatusPageServices.Interfaces
 {
     public interface IUserService
     {
+        Task<IEnumerable<UserDto>> GetAllAsync();
         Task<UserDto> CreateAsync(CreateUserDto dto);
         Task DeleteAsync(int id);
         Task<UserDto?> GetByIdAsync(int id);

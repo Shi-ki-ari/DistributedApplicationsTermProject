@@ -1,0 +1,173 @@
+@page
+@model StatusPageRazorUI.Pages.IncidentsModel
+
+<h1 class="mb-4">Incidents</h1>
+
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#addIncidentModal">
+        Add Incident
+    </button>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-6">
+        <input class="form-control" name="SearchTerm" value="@Model.SearchTerm" placeholder="Search incidents..." />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Service</th>
+            <th>Start</th>
+            <th>Scheduled</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Incidents.Items.Any())
+        {
+            foreach (var incident in Model.Incidents.Items)
+            {
+                <tr>
+                    <td>@incident.Id</td>
+                    <td>@incident.Title</td>
+                    <td>@incident.ServiceId</td>
+                    <td>@incident.StartTime.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@(incident.IsScheduled ? "Yes" : "No")</td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#incidentDetails-@incident.Id">
+                            View
+                        </button>
+                        <form method="post" asp-page-handler="Delete" class="d-inline">
+                            <input type="hidden" name="id" value="@incident.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No incidents found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.Incidents.Items.Any())
+{
+    foreach (var incident in Model.Incidents.Items)
+    {
+        <div class="modal fade" id="incidentDetails-@incident.Id" tabindex="-1" aria-labelledby="incidentDetailsLabel-@incident.Id" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="incidentDetailsLabel-@incident.Id">Incident Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Title</dt>
+                            <dd class="col-sm-8">@incident.Title</dd>
+                            <dt class="col-sm-4">Description</dt>
+                            <dd class="col-sm-8">@incident.Description</dd>
+                            <dt class="col-sm-4">Start</dt>
+                            <dd class="col-sm-8">@incident.StartTime.ToString("yyyy-MM-dd HH:mm")</dd>
+                            <dt class="col-sm-4">End</dt>
+                            <dd class="col-sm-8">@(incident.EndTime?.ToString("yyyy-MM-dd HH:mm") ?? "-")</dd>
+                            <dt class="col-sm-4">Scheduled</dt>
+                            <dd class="col-sm-8">@(incident.IsScheduled ? "Yes" : "No")</dd>
+                            <dt class="col-sm-4">System</dt>
+                            <dd class="col-sm-8">@(incident.IsSystemGenerated ? "Yes" : "No")</dd>
+                            <dt class="col-sm-4">Service</dt>
+                            <dd class="col-sm-8">@incident.ServiceId</dd>
+                            <dt class="col-sm-4">Engineer</dt>
+                            <dd class="col-sm-8">@(incident.AssignedEngineerId?.ToString() ?? "-")</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div class="modal fade" id="addIncidentModal" tabindex="-1" aria-labelledby="addIncidentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addIncidentModalLabel">Add Incident</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="Create">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="incidentTitle" class="form-label">Title</label>
+                        <input id="incidentTitle" name="title" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="incidentDescription" class="form-label">Description</label>
+                        <textarea id="incidentDescription" name="description" class="form-control" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="incidentStartTime" class="form-label">Start Time</label>
+                        <input id="incidentStartTime" name="startTime" type="datetime-local" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="incidentEndTime" class="form-label">End Time</label>
+                        <input id="incidentEndTime" name="endTime" type="datetime-local" class="form-control" />
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input id="incidentIsScheduled" name="isScheduled" type="checkbox" class="form-check-input" value="true" />
+                        <label class="form-check-label" for="incidentIsScheduled">Scheduled</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input id="incidentIsSystemGenerated" name="isSystemGenerated" type="checkbox" class="form-check-input" value="true" />
+                        <label class="form-check-label" for="incidentIsSystemGenerated">System Generated</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="incidentServiceId" class="form-label">Service Id</label>
+                        <input id="incidentServiceId" name="serviceId" type="number" min="1" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="incidentEngineerId" class="form-label">Assigned Engineer Id</label>
+                        <input id="incidentEngineerId" name="assignedEngineerId" type="number" min="1" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<nav aria-label="Incidents pagination">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : string.Empty)">
+            <a class="page-link"
+               asp-page="/Incidents"
+               asp-route-PageNumber="@(Model.PageNumber - 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.SearchTerm">Previous</a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">Page @Model.PageNumber of @Model.Incidents.TotalPages</span>
+        </li>
+        <li class="page-item @(Model.PageNumber >= Model.Incidents.TotalPages ? "disabled" : string.Empty)">
+            <a class="page-link"
+               asp-page="/Incidents"
+               asp-route-PageNumber="@(Model.PageNumber + 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.SearchTerm">Next</a>
+        </li>
+    </ul>
+</nav>

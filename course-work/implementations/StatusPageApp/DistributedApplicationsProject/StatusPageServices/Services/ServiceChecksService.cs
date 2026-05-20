@@ -52,6 +52,11 @@ namespace StatusPageServices.Services
             return ToDto(entity);
         }
 
+        public async Task DeleteAsync(int id)
+        {
+            await DeleteEntityAsync(id);
+        }
+
         public async Task<IEnumerable<ServiceCheckDto>> ExecuteSweepAsync()
         {
             //get all services

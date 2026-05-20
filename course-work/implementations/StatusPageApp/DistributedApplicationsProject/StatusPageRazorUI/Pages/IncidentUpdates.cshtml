@@ -1,0 +1,151 @@
+@page
+@model StatusPageRazorUI.Pages.IncidentUpdatesModel
+
+<h1 class="mb-4">Incident Updates</h1>
+
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#addUpdateModal">
+        Add Update
+    </button>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-6">
+        <input class="form-control" name="SearchTerm" value="@Model.SearchTerm" placeholder="Search updates..." />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Message</th>
+            <th>Status</th>
+            <th>Incident</th>
+            <th>Engineer</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Updates.Items.Any())
+        {
+            foreach (var update in Model.Updates.Items)
+            {
+                <tr>
+                    <td>@update.Id</td>
+                    <td>@update.Message</td>
+                    <td>@update.UpdateStatus</td>
+                    <td>@update.IncidentId</td>
+                    <td>@update.EngineerId</td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#updateDetails-@update.Id">
+                            View
+                        </button>
+                        <form method="post" asp-page-handler="Delete" class="d-inline">
+                            <input type="hidden" name="id" value="@update.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No updates found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.Updates.Items.Any())
+{
+    foreach (var update in Model.Updates.Items)
+    {
+        <div class="modal fade" id="updateDetails-@update.Id" tabindex="-1" aria-labelledby="updateDetailsLabel-@update.Id" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateDetailsLabel-@update.Id">Incident Update</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Message</dt>
+                            <dd class="col-sm-8">@update.Message</dd>
+                            <dt class="col-sm-4">Status</dt>
+                            <dd class="col-sm-8">@update.UpdateStatus</dd>
+                            <dt class="col-sm-4">Incident</dt>
+                            <dd class="col-sm-8">@update.IncidentId</dd>
+                            <dt class="col-sm-4">Engineer</dt>
+                            <dd class="col-sm-8">@update.EngineerId</dd>
+                            <dt class="col-sm-4">Posted</dt>
+                            <dd class="col-sm-8">@update.PostedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div class="modal fade" id="addUpdateModal" tabindex="-1" aria-labelledby="addUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUpdateModalLabel">Add Incident Update</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="Create">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="updateMessage" class="form-label">Message</label>
+                        <textarea id="updateMessage" name="message" class="form-control" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateStatus" class="form-label">Status</label>
+                        <input id="updateStatus" name="updateStatus" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateIncidentId" class="form-label">Incident Id</label>
+                        <input id="updateIncidentId" name="incidentId" type="number" min="1" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateEngineerId" class="form-label">Engineer Id</label>
+                        <input id="updateEngineerId" name="engineerId" type="number" min="1" class="form-control" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<nav aria-label="Incident updates pagination">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : string.Empty)">
+            <a class="page-link"
+               asp-page="/IncidentUpdates"
+               asp-route-PageNumber="@(Model.PageNumber - 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.SearchTerm">Previous</a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">Page @Model.PageNumber of @Model.Updates.TotalPages</span>
+        </li>
+        <li class="page-item @(Model.PageNumber >= Model.Updates.TotalPages ? "disabled" : string.Empty)">
+            <a class="page-link"
+               asp-page="/IncidentUpdates"
+               asp-route-PageNumber="@(Model.PageNumber + 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.SearchTerm">Next</a>
+        </li>
+    </ul>
+</nav>

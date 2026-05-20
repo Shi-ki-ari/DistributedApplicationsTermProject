@@ -1,0 +1,118 @@
+@page
+@model StatusPageRazorUI.Pages.ServiceChecksModel
+
+<h1 class="mb-4">Service Checks</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-6">
+        <input class="form-control" name="SearchTerm" value="@Model.SearchTerm" placeholder="Search checks..." />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Service</th>
+            <th>Checked</th>
+            <th>Healthy</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Checks.Items.Any())
+        {
+            foreach (var check in Model.Checks.Items)
+            {
+                <tr>
+                    <td>@check.Id</td>
+                    <td>@check.ServiceId</td>
+                    <td>@check.CheckedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@(check.IsHealthy ? "Yes" : "No")</td>
+                    <td>@(check.StatusCode?.ToString() ?? "-")</td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#checkDetails-@check.Id">
+                            View
+                        </button>
+                        <form method="post" asp-page-handler="Delete" class="d-inline">
+                            <input type="hidden" name="id" value="@check.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No checks found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.Checks.Items.Any())
+{
+    foreach (var check in Model.Checks.Items)
+    {
+        <div class="modal fade" id="checkDetails-@check.Id" tabindex="-1" aria-labelledby="checkDetailsLabel-@check.Id" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="checkDetailsLabel-@check.Id">Service Check Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Service</dt>
+                            <dd class="col-sm-8">@check.ServiceId</dd>
+                            <dt class="col-sm-4">Checked</dt>
+                            <dd class="col-sm-8">@check.CheckedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+                            <dt class="col-sm-4">Healthy</dt>
+                            <dd class="col-sm-8">@(check.IsHealthy ? "Yes" : "No")</dd>
+                            <dt class="col-sm-4">Status</dt>
+                            <dd class="col-sm-8">@(check.StatusCode?.ToString() ?? "-")</dd>
+                            <dt class="col-sm-4">Response</dt>
+                            <dd class="col-sm-8">@(check.ResponseTimeMs?.ToString() ?? "-")</dd>
+                            <dt class="col-sm-4">Error</dt>
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(check.ErrorMessage) ? "-" : check.ErrorMessage)</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<nav aria-label="Service checks pagination">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : string.Empty)">
+            <a class="page-link"
+               asp-page="/ServiceChecks"
+               asp-route-PageNumber="@(Model.PageNumber - 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.SearchTerm">Previous</a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">Page @Model.PageNumber of @Model.Checks.TotalPages</span>
+        </li>
+        <li class="page-item @(Model.PageNumber >= Model.Checks.TotalPages ? "disabled" : string.Empty)">
+            <a class="page-link"
+               asp-page="/ServiceChecks"
+               asp-route-PageNumber="@(Model.PageNumber + 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.SearchTerm">Next</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="position-fixed bottom-0 start-50 translate-middle-x mb-5" style="z-index: 1030;">
+    <form method="post" asp-page-handler="Sweep">
+        <button type="submit" class="btn btn-warning">Run Sweeping Ping</button>
+    </form>
+</div>

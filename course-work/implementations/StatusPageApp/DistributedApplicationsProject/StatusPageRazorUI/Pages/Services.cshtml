@@ -1,0 +1,153 @@
+@page
+@model StatusPageRazorUI.Pages.ServicesModel
+
+<h1 class="mb-4">Services</h1>
+
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+        Add Service
+    </button>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-6">
+        <input class="form-control" name="SearchTerm" value="@Model.SearchTerm" placeholder="Search services..." />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Target URL</th>
+            <th>Category</th>
+            <th>Online</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Services.Items.Any())
+        {
+            foreach (var service in Model.Services.Items)
+            {
+                <tr>
+                    <td>@service.Id</td>
+                    <td>@service.Name</td>
+                    <td>@service.TargetUrl</td>
+                    <td>@service.CategoryId</td>
+                    <td>@(service.IsOnline ? "Yes" : "No")</td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#serviceDetails-@service.Id">
+                            View
+                        </button>
+                        <form method="post" asp-page-handler="Delete" class="d-inline">
+                            <input type="hidden" name="id" value="@service.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No services found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.Services.Items.Any())
+{
+    foreach (var service in Model.Services.Items)
+    {
+        <div class="modal fade" id="serviceDetails-@service.Id" tabindex="-1" aria-labelledby="serviceDetailsLabel-@service.Id" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="serviceDetailsLabel-@service.Id">Service Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Name</dt>
+                            <dd class="col-sm-8">@service.Name</dd>
+                            <dt class="col-sm-4">Target URL</dt>
+                            <dd class="col-sm-8">@service.TargetUrl</dd>
+                            <dt class="col-sm-4">Category</dt>
+                            <dd class="col-sm-8">@service.CategoryId</dd>
+                            <dt class="col-sm-4">Online</dt>
+                            <dd class="col-sm-8">@(service.IsOnline ? "Yes" : "No")</dd>
+                            <dt class="col-sm-4">Added</dt>
+                            <dd class="col-sm-8">@service.DateAdded.ToString("yyyy-MM-dd")</dd>
+                            <dt class="col-sm-4">Uptime %</dt>
+                            <dd class="col-sm-8">@service.UptimePercentage</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addServiceModalLabel">Add Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="Create">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="serviceName" class="form-label">Name</label>
+                        <input id="serviceName" name="name" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="serviceTargetUrl" class="form-label">Target URL</label>
+                        <input id="serviceTargetUrl" name="targetUrl" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="serviceCategoryId" class="form-label">Category Id</label>
+                        <input id="serviceCategoryId" name="categoryId" type="number" min="1" class="form-control" required />
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input id="serviceIsOnline" name="isOnline" type="checkbox" class="form-check-input" value="true" />
+                        <label class="form-check-label" for="serviceIsOnline">Online</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<nav aria-label="Services pagination">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : string.Empty)">
+            <a class="page-link"
+               asp-page="/Services"
+               asp-route-PageNumber="@(Model.PageNumber - 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.SearchTerm">Previous</a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">Page @Model.PageNumber of @Model.Services.TotalPages</span>
+        </li>
+        <li class="page-item @(Model.PageNumber >= Model.Services.TotalPages ? "disabled" : string.Empty)">
+            <a class="page-link"
+               asp-page="/Services"
+               asp-route-PageNumber="@(Model.PageNumber + 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.SearchTerm">Next</a>
+        </li>
+    </ul>
+</nav>
