@@ -1,7 +1,7 @@
 @page
-@model StatusPageRazorUI.Pages.LoginModel
+@model StatusPageRazorUI.Pages.RegisterModel
 
-<h1 class="mb-4">Login</h1>
+<h1 class="mb-4">Register</h1>
 
 <form method="post" class="row g-3">
     <div class="col-12">
@@ -15,8 +15,13 @@
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
     <div class="col-12">
-        <button type="submit" class="btn btn-primary">Login</button>
-        <a class="btn btn-link" asp-page="/Register">Register</a>
+        <label asp-for="ConfirmPassword" class="form-label"></label>
+        <input asp-for="ConfirmPassword" type="password" class="form-control" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Register</button>
+        <a class="btn btn-link" asp-page="/Login">Back to Login</a>
     </div>
 </form>
 

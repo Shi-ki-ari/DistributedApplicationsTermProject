@@ -35,7 +35,7 @@ namespace StatusPageServices.Services
 
         public bool VerifyPassword(string inputPassword, string storedPassword)
         {
-            return inputPassword == storedPassword;
+            return BCrypt.Net.BCrypt.Verify(inputPassword, storedPassword);
         }
 
         public async Task<UserDto> CreateAsync(CreateUserDto dto)
@@ -62,7 +62,7 @@ namespace StatusPageServices.Services
             return new UserEntity
             {
                 Username = dto.Username,
-                Password = dto.Password,
+                Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             };
         }
 

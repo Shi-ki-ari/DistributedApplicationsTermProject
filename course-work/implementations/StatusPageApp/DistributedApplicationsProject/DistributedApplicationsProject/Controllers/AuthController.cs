@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StatusPageServices.Services;
 using StatusPageServices.Interfaces;
+using StatusPageServices.RequestDTO.Users.StatusPageServices.RequestDTO.Users;
+using StatusPageServices.Services;
 
 namespace StatusPageAPI.Controllers
 {
@@ -31,9 +32,27 @@ namespace StatusPageAPI.Controllers
             var token = _tokenService.CreateSimpleToken(request.Username);
             return Ok(new { Token = token });
         }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        {
+            if (await _userService.UsernameExistsAsync(request.Username))
+            {
+                return BadRequest("Username already taken");
+            }
+
+            var created = await _userService.CreateAsync(new CreateUserDto(request.Username, request.Password));
+            return Ok(created);
+        }
     }
 
     public class LoginRequest
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class RegisterRequest
     {
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
