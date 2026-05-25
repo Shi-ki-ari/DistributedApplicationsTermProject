@@ -41,6 +41,9 @@ namespace StatusPageData
                 .HasForeignKey(i => i.IncidentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<UserEntity>()
+                .ToTable("Users");
+
 
             modelBuilder.Entity<UserEntity>().HasData(
                 new UserEntity
@@ -49,6 +52,51 @@ namespace StatusPageData
                     Username = "admin",
                     Password = "password123"
                 });
+
+            // Seed some default service categories and services for testing/demo
+            modelBuilder.Entity<ServiceCategoryEntity>().HasData(
+                new ServiceCategoryEntity
+                {
+                    Id = 1,
+                    Name = "External",
+                    Description = "External third-party services",
+                    DisplayOrder = 1,
+                    CreatedAt = new DateTime(2026, 1, 1),
+                    Notify = false
+                },
+                new ServiceCategoryEntity
+                {
+                    Id = 2,
+                    Name = "Testing",
+                    Description = "Test endpoints used for health checks",
+                    DisplayOrder = 2,
+                    CreatedAt = new DateTime(2026, 1, 2),
+                    Notify = false
+                }
+            );
+
+            modelBuilder.Entity<ServiceEntity>().HasData(
+                new ServiceEntity
+                {
+                    Id = 1,
+                    Name = "Google",
+                    TargetUrl = "https://www.google.com",
+                    IsOnline = true,
+                    DateAdded = new DateTime(2026, 1, 1),
+                    UptimePercentage = 99.99m,
+                    CategoryId = 1
+                },
+                new ServiceEntity
+                {
+                    Id = 2,
+                    Name = "HttpStat 404",
+                    TargetUrl = "https://httpstat.us/404",
+                    IsOnline = false,
+                    DateAdded = new DateTime(2026, 1, 2),
+                    UptimePercentage = 0m,
+                    CategoryId = 2
+                }
+            );
 
         }
 

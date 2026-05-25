@@ -2,15 +2,13 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using StatusPageServices.RequestDTO.Incidents;
-using StatusPageServices.ResponseDTO;
-using StatusPageServices.ResponseDTO.Incidents;
+using StatusPageRazorUI.Models;
 
 namespace StatusPageRazorUI.Pages
 {
     public class IncidentsModel : PageModel
     {
-        private const string IncidentsApiUrl = "https://localhost:7246/api/incidents";
+        private const string IncidentsApiUrl = "api/incidents";
         private readonly IHttpClientFactory _httpClientFactory;
 
         public IncidentsModel(IHttpClientFactory httpClientFactory)
@@ -36,7 +34,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var url = $"{IncidentsApiUrl}?PageNumber={PageNumber}&PageSize={PageSize}";
@@ -58,11 +56,20 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var dto = new CreateIncidentDto(title, description, startTime, endTime, isScheduled, serviceId, assignedEngineerId, isSystemGenerated);
-            await client.PostAsJsonAsync(IncidentsApiUrl, dto);
+            await client.PostAsJsonAsync(IncidentsApiUrl, new
+            {
+                Title = title,
+                Description = description,
+                StartTime = startTime,
+                EndTime = endTime,
+                IsScheduled = isScheduled,
+                ServiceId = serviceId,
+                AssignedEngineerId = assignedEngineerId,
+                IsSystemGenerated = isSystemGenerated
+            });
 
             return RedirectToPage("/Incidents", new { PageNumber, PageSize, SearchTerm });
         }
@@ -74,7 +81,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             await client.DeleteAsync($"{IncidentsApiUrl}/{id}");

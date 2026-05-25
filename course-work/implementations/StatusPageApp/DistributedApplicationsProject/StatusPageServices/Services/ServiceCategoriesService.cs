@@ -32,7 +32,8 @@ namespace StatusPageServices.Services
         public async Task<IEnumerable<ServiceCategoryDto>> GetAllAsync()
         {
             var entities = await GetAllEntityAsync();
-            return entities.Select(ToDto);
+            // Return categories ordered by DisplayOrder so UI displays them in the defined order
+            return entities.OrderBy(e => e.DisplayOrder).Select(ToDto);
         }
 
         public async Task<ServiceCategoryDto?> GetByIdAsync(int id)

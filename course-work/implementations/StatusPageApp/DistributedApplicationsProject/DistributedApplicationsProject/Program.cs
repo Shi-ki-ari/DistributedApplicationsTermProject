@@ -71,6 +71,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddAuthorization();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("UiCors", policy =>
+    {
+        var uiBaseUrl = builder.Configuration["UiBaseUrl"];
+        if (!string.IsNullOrWhiteSpace(uiBaseUrl))
+        {
+            policy.WithOrigins(uiBaseUrl)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+        else
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    });
+});
 
 // Connection string
 var connectionString = builder.Configuration.GetConnectionString("StatusPageDb");
@@ -100,12 +119,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("UiCors");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Serve static files from wwwroot (dashboard HTML/CSS/JS)
 app.UseDefaultFiles();
-app.UseStaticFiles();
 
 app.MapControllers();
 

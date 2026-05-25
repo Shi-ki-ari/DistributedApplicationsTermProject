@@ -2,15 +2,13 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using StatusPageServices.RequestDTO.IncidentUpdates;
-using StatusPageServices.ResponseDTO;
-using StatusPageServices.ResponseDTO.IncidentUpdates;
+using StatusPageRazorUI.Models;
 
 namespace StatusPageRazorUI.Pages
 {
     public class IncidentUpdatesModel : PageModel
     {
-        private const string IncidentUpdatesApiUrl = "https://localhost:7246/api/incidentupdates";
+        private const string IncidentUpdatesApiUrl = "api/incidentupdates";
         private readonly IHttpClientFactory _httpClientFactory;
 
         public IncidentUpdatesModel(IHttpClientFactory httpClientFactory)
@@ -36,7 +34,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var items = await client.GetFromJsonAsync<List<IncidentUpdateDto>>(IncidentUpdatesApiUrl)
@@ -62,11 +60,16 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var dto = new CreateIncidentUpdateDto(message, updateStatus, incidentId, engineerId);
-            await client.PostAsJsonAsync(IncidentUpdatesApiUrl, dto);
+            await client.PostAsJsonAsync(IncidentUpdatesApiUrl, new
+            {
+                Message = message,
+                UpdateStatus = updateStatus,
+                IncidentId = incidentId,
+                EngineerId = engineerId
+            });
 
             return RedirectToPage("/IncidentUpdates", new { PageNumber, PageSize, SearchTerm });
         }
@@ -78,7 +81,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             await client.DeleteAsync($"{IncidentUpdatesApiUrl}/{id}");

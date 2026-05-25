@@ -1,13 +1,12 @@
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using CreateUserDto = StatusPageServices.RequestDTO.Users.StatusPageServices.RequestDTO.Users.CreateUserDto;
 
 namespace StatusPageRazorUI.Pages
 {
     public class RegisterModel : PageModel
     {
-        private const string RegisterApiUrl = "https://localhost:7246/api/auth/register";
+        private const string RegisterApiUrl = "api/auth/register";
         private readonly IHttpClientFactory _httpClientFactory;
 
         public RegisterModel(IHttpClientFactory httpClientFactory)
@@ -41,9 +40,8 @@ namespace StatusPageRazorUI.Pages
                 return Page();
             }
 
-            var client = _httpClientFactory.CreateClient();
-            var dto = new CreateUserDto(Username, Password);
-            var response = await client.PostAsJsonAsync(RegisterApiUrl, dto);
+            var client = _httpClientFactory.CreateClient("ApiClient");
+            var response = await client.PostAsJsonAsync(RegisterApiUrl, new { Username, Password });
 
             if (!response.IsSuccessStatusCode)
             {

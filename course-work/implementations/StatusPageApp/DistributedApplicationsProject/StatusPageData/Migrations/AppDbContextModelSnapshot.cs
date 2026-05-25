@@ -157,6 +157,26 @@ namespace StatusPageData.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ServiceCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "External third-party services",
+                            DisplayOrder = 1,
+                            Name = "External",
+                            Notify = false
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2026, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Test endpoints used for health checks",
+                            DisplayOrder = 2,
+                            Name = "Testing",
+                            Notify = false
+                        });
                 });
 
             modelBuilder.Entity("StatusPageData.Entities.ServiceCheckEntity", b =>
@@ -225,6 +245,28 @@ namespace StatusPageData.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Services");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CategoryId = 1,
+                            DateAdded = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsOnline = true,
+                            Name = "Google",
+                            TargetUrl = "https://www.google.com",
+                            UptimePercentage = 99.99m
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CategoryId = 2,
+                            DateAdded = new DateTime(2026, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsOnline = false,
+                            Name = "HttpStat 404",
+                            TargetUrl = "https://httpstat.us/404",
+                            UptimePercentage = 0m
+                        });
                 });
 
             modelBuilder.Entity("StatusPageData.Entities.UserEntity", b =>
@@ -245,7 +287,7 @@ namespace StatusPageData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasData(
                         new

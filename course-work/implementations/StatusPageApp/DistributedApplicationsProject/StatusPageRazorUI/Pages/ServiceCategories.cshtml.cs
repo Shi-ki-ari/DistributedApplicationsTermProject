@@ -2,15 +2,13 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using StatusPageServices.RequestDTO.ServiceCategories;
-using StatusPageServices.ResponseDTO;
-using StatusPageServices.ResponseDTO.ServiceCategories;
+using StatusPageRazorUI.Models;
 
 namespace StatusPageRazorUI.Pages
 {
     public class ServiceCategoriesModel : PageModel
     {
-        private const string ServiceCategoriesApiUrl = "https://localhost:7246/api/servicecategories";
+        private const string ServiceCategoriesApiUrl = "api/servicecategories";
         private readonly IHttpClientFactory _httpClientFactory;
 
         public ServiceCategoriesModel(IHttpClientFactory httpClientFactory)
@@ -36,7 +34,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var items = await client.GetFromJsonAsync<List<ServiceCategoryDto>>(ServiceCategoriesApiUrl)
@@ -62,11 +60,16 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var dto = new CreateServiceCategoryDto(name, description, displayOrder, notify);
-            await client.PostAsJsonAsync(ServiceCategoriesApiUrl, dto);
+            await client.PostAsJsonAsync(ServiceCategoriesApiUrl, new
+            {
+                Name = name,
+                Description = description,
+                DisplayOrder = displayOrder,
+                Notify = notify
+            });
 
             return RedirectToPage("/ServiceCategories", new { PageNumber, PageSize, SearchTerm });
         }
@@ -78,7 +81,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             await client.DeleteAsync($"{ServiceCategoriesApiUrl}/{id}");

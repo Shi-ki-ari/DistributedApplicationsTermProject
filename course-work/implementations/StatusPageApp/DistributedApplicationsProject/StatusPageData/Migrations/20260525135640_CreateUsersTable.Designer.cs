@@ -12,8 +12,8 @@ using StatusPageData;
 namespace StatusPageData.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260514144133_AddUsersTable")]
-    partial class AddUsersTable
+    [Migration("20260525135640_CreateUsersTable")]
+    partial class CreateUsersTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,7 +63,7 @@ namespace StatusPageData.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AssignedEngineerId")
+                    b.Property<int?>("AssignedEngineerId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -76,11 +76,18 @@ namespace StatusPageData.Migrations
                     b.Property<bool>("IsScheduled")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsSystemGenerated")
+                        .HasColumnType("bit");
+
                     b.Property<int>("ServiceId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -104,9 +111,6 @@ namespace StatusPageData.Migrations
 
                     b.Property<int>("IncidentId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsSystemGenerated")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -156,6 +160,26 @@ namespace StatusPageData.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ServiceCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "External third-party services",
+                            DisplayOrder = 1,
+                            Name = "External",
+                            Notify = false
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2026, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Test endpoints used for health checks",
+                            DisplayOrder = 2,
+                            Name = "Testing",
+                            Notify = false
+                        });
                 });
 
             modelBuilder.Entity("StatusPageData.Entities.ServiceCheckEntity", b =>
@@ -224,6 +248,28 @@ namespace StatusPageData.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Services");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CategoryId = 1,
+                            DateAdded = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsOnline = true,
+                            Name = "Google",
+                            TargetUrl = "https://www.google.com",
+                            UptimePercentage = 99.99m
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CategoryId = 2,
+                            DateAdded = new DateTime(2026, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsOnline = false,
+                            Name = "HttpStat 404",
+                            TargetUrl = "https://httpstat.us/404",
+                            UptimePercentage = 0m
+                        });
                 });
 
             modelBuilder.Entity("StatusPageData.Entities.UserEntity", b =>
@@ -244,7 +290,15 @@ namespace StatusPageData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Password = "password123",
+                            Username = "admin"
+                        });
                 });
 
             modelBuilder.Entity("StatusPageData.Entities.IncidentEntity", b =>
@@ -252,8 +306,7 @@ namespace StatusPageData.Migrations
                     b.HasOne("StatusPageData.Entities.EngineerEntity", "AssignedEngineer")
                         .WithMany("AssignedIncidents")
                         .HasForeignKey("AssignedEngineerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("StatusPageData.Entities.ServiceEntity", "Service")
                         .WithMany("Incidents")

@@ -2,14 +2,13 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using StatusPageServices.ResponseDTO;
-using StatusPageServices.ResponseDTO.ServiceChecks;
+using StatusPageRazorUI.Models;
 
 namespace StatusPageRazorUI.Pages
 {
     public class ServiceChecksModel : PageModel
     {
-        private const string ServiceChecksApiUrl = "https://localhost:7246/api/servicechecks";
+        private const string ServiceChecksApiUrl = "api/servicechecks";
         private readonly IHttpClientFactory _httpClientFactory;
 
         public ServiceChecksModel(IHttpClientFactory httpClientFactory)
@@ -35,7 +34,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var items = await client.GetFromJsonAsync<List<ServiceCheckDto>>(ServiceChecksApiUrl)
@@ -62,7 +61,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             await client.DeleteAsync($"{ServiceChecksApiUrl}/{id}");
@@ -77,7 +76,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             await client.PostAsync($"{ServiceChecksApiUrl}/sweep", null);

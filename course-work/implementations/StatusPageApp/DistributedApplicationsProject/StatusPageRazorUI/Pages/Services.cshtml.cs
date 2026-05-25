@@ -2,15 +2,13 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using StatusPageServices.RequestDTO.Services;
-using StatusPageServices.ResponseDTO;
-using StatusPageServices.ResponseDTO.Services;
+using StatusPageRazorUI.Models;
 
 namespace StatusPageRazorUI.Pages
 {
     public class ServicesModel : PageModel
     {
-        private const string ServicesApiUrl = "https://localhost:7246/api/services";
+        private const string ServicesApiUrl = "api/services";
         private readonly IHttpClientFactory _httpClientFactory;
 
         public ServicesModel(IHttpClientFactory httpClientFactory)
@@ -36,7 +34,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var url = $"{ServicesApiUrl}?PageNumber={PageNumber}&PageSize={PageSize}";
@@ -58,11 +56,16 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var dto = new CreateServiceDto(name, targetUrl, categoryId, isOnline);
-            await client.PostAsJsonAsync(ServicesApiUrl, dto);
+            await client.PostAsJsonAsync(ServicesApiUrl, new
+            {
+                Name = name,
+                TargetUrl = targetUrl,
+                CategoryId = categoryId,
+                IsOnline = isOnline
+            });
 
             return RedirectToPage("/Services", new { PageNumber, PageSize, SearchTerm });
         }
@@ -74,7 +77,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             await client.DeleteAsync($"{ServicesApiUrl}/{id}");

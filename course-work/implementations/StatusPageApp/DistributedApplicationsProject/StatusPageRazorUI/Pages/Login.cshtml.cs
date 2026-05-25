@@ -6,7 +6,7 @@ namespace StatusPageRazorUI.Pages
 {
     public class LoginModel : PageModel
     {
-        private const string LoginApiUrl = "https://localhost:7246/api/auth/login";
+        private const string LoginApiUrl = "api/auth/login";
         private readonly IHttpClientFactory _httpClientFactory;
 
         public LoginModel(IHttpClientFactory httpClientFactory)
@@ -31,7 +31,7 @@ namespace StatusPageRazorUI.Pages
                 return Page();
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             var response = await client.PostAsJsonAsync(LoginApiUrl, new { Username, Password });
             if (!response.IsSuccessStatusCode)
             {

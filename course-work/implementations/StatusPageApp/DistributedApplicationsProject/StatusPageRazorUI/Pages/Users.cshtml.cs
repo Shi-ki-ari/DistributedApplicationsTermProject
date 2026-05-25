@@ -2,15 +2,13 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using StatusPageServices.ResponseDTO;
-using StatusPageServices.ResponseDTO.User;
-using CreateUserDto = StatusPageServices.RequestDTO.Users.StatusPageServices.RequestDTO.Users.CreateUserDto;
+using StatusPageRazorUI.Models;
 
 namespace StatusPageRazorUI.Pages
 {
     public class UsersModel : PageModel
     {
-        private const string UsersApiUrl = "https://localhost:7246/api/users";
+        private const string UsersApiUrl = "api/users";
         private readonly IHttpClientFactory _httpClientFactory;
 
         public UsersModel(IHttpClientFactory httpClientFactory)
@@ -36,7 +34,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var items = await client.GetFromJsonAsync<List<UserDto>>(UsersApiUrl)
@@ -61,11 +59,14 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var dto = new CreateUserDto(username, password);
-            await client.PostAsJsonAsync(UsersApiUrl, dto);
+            await client.PostAsJsonAsync(UsersApiUrl, new
+            {
+                Username = username,
+                Password = password
+            });
 
             return RedirectToPage("/Users", new { PageNumber, PageSize, SearchTerm });
         }
@@ -77,7 +78,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             await client.DeleteAsync($"{UsersApiUrl}/{id}");

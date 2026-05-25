@@ -72,7 +72,7 @@ namespace StatusPageServices.Services
             {
                 await AddEntityAsync(check);
 
-                if (!check.IsHealthy)
+                if (!check.IsHealthy) //if check failed, create an incident for it
                 {
                     servicesById.TryGetValue(check.ServiceId, out var service);
                     var title = service is null
@@ -82,7 +82,7 @@ namespace StatusPageServices.Services
                         ? "Service health check failed."
                         : check.ErrorMessage;
 
-                    var incident = new IncidentEntity
+                    var incident = new IncidentEntity //fill in incident details based on the check and service info
                     {
                         Title = title,
                         Description = description,
@@ -94,10 +94,10 @@ namespace StatusPageServices.Services
                         AssignedEngineerId = null
                     };
 
-                    await _incidentsRepo.AddAsync(incident);
+                    await _incidentsRepo.AddAsync(incident); //save the new incident to the database
                 }
             }
-            return resultsList.Select(ToDto);
+            return resultsList.Select(ToDto); //convert all check entities to DTOs and return them
         }
 
         private static readonly HttpClient HttpClient = new HttpClient();
@@ -110,14 +110,14 @@ namespace StatusPageServices.Services
                 CheckedAt = DateTime.UtcNow
             };
 
-            if (!Uri.TryCreate(service.TargetUrl, UriKind.Absolute, out var target))
+            if (!Uri.TryCreate(service.TargetUrl, UriKind.Absolute, out var target)) //if NOT valid url, mark check as failed and return immediately
             {
                 check.IsHealthy = false;
                 check.ErrorMessage = "Invalid service URL.";
                 return check;
             }
 
-            var stopwatch = Stopwatch.StartNew();
+            var stopwatch = Stopwatch.StartNew(); //start timing before the request is sent
             try
             {
                 using var response = await HttpClient.GetAsync(target);
@@ -151,17 +151,5 @@ namespace StatusPageServices.Services
             );
         }
 
-        private static ServiceCheckEntity ToEntity(CreateServiceCheckDto dto)
-        {
-            return new ServiceCheckEntity
-            {
-                ServiceId = dto.ServiceId,
-                CheckedAt = dto.CheckedAt,
-                IsHealthy = dto.IsHealthy,
-                ResponseTimeMs = dto.ResponseTimeMs,
-                StatusCode = dto.StatusCode,
-                ErrorMessage = dto.ErrorMessage
-            };
         }
     }
-}

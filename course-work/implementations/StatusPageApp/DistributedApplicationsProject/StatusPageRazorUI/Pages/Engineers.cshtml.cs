@@ -3,15 +3,13 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using StatusPageServices.RequestDTO.Engineers;
-using StatusPageServices.ResponseDTO;
-using StatusPageServices.ResponseDTO.Engineers;
+using StatusPageRazorUI.Models;
 
 namespace StatusPageRazorUI.Pages
 {
     public class EngineersModel : PageModel
     {
-        private const string EngineersApiUrl = "https://localhost:7246/api/engineers";
+        private const string EngineersApiUrl = "api/engineers";
         private readonly IHttpClientFactory _httpClientFactory;
 
         public EngineersModel(IHttpClientFactory httpClientFactory)
@@ -37,7 +35,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var url = $"{EngineersApiUrl}?PageNumber={PageNumber}&PageSize={PageSize}";
@@ -59,11 +57,17 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var dto = new CreateEngineerDto(name, email, hiredDate, onCall, hourlyRate);
-            var response = await client.PostAsJsonAsync(EngineersApiUrl, dto);
+            var response = await client.PostAsJsonAsync(EngineersApiUrl, new
+            {
+                Name = name,
+                Email = email,
+                HiredDate = hiredDate,
+                OnCall = onCall,
+                HourlyRate = hourlyRate
+            });
 
             if (!response.IsSuccessStatusCode)
             {
@@ -80,7 +84,7 @@ namespace StatusPageRazorUI.Pages
                 return RedirectToPage("/Login");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiClient");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var response = await client.DeleteAsync($"{EngineersApiUrl}/{id}");
