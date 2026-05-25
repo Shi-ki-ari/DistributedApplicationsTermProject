@@ -1,0 +1,802 @@
+openapi: 3.0.1
+info:
+  title: StatusPageAPI
+  description: Подробна документация за система за мониторинг (Status Page) и управление на инциденти. Включва регистрация, аутентикация, управление на услуги и автоматизирани проверки.
+  version: v1
+security:
+  - Bearer: []
+paths:
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Вход в системата
+      description: Аутентикира потребител и връща JWT токен.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Успешен вход
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+
+  /api/auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Регистрация на нов потребител
+      description: Създава нов потребителски профил в системата.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '200':
+          description: Потребителят е успешно регистриран
+
+  /api/Engineers:
+    get:
+      tags:
+        - Engineers
+      summary: Вземане на всички инженери
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: SearchTerm
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешна заявка
+    post:
+      tags:
+        - Engineers
+      summary: Добавяне на инженер
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEngineerDto'
+      responses:
+        '200':
+          description: Успешно създаване
+
+  /api/Engineers/{id}:
+    get:
+      tags:
+        - Engineers
+      summary: Детайли за инженер
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+        - Engineers
+      summary: Редактиране на инженер
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEngineerDto'
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - Engineers
+      summary: Изтриване на инженер
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+
+  /api/Incidents:
+    get:
+      tags:
+        - Incidents
+      summary: Списък с инциденти
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: SearchTerm
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+        - Incidents
+      summary: Създаване на инцидент
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIncidentDto'
+      responses:
+        '200':
+          description: OK
+
+  /api/Incidents/{id}:
+    get:
+      tags:
+        - Incidents
+      summary: Детайли за инцидент
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+        - Incidents
+      summary: Обновяване на инцидент
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIncidentDto'
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - Incidents
+      summary: Изтриване на инцидент
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+
+  /api/IncidentUpdates:
+    get:
+      tags:
+        - IncidentUpdates
+      summary: Всички ъпдейти
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+        - IncidentUpdates
+      summary: Добавяне на ъпдейт
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIncidentUpdateDto'
+      responses:
+        '200':
+          description: OK
+
+  /api/IncidentUpdates/{id}:
+    get:
+      tags:
+        - IncidentUpdates
+      summary: Вземане на ъпдейт
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+        - IncidentUpdates
+      summary: Редакция на ъпдейт
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIncidentUpdateDto'
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - IncidentUpdates
+      summary: Изтриване на ъпдейт
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+
+  /api/ServiceCategories:
+    get:
+      tags:
+        - ServiceCategories
+      summary: Списък с категории
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+        - ServiceCategories
+      summary: Създаване на категория
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServiceCategoryDto'
+      responses:
+        '200':
+          description: OK
+
+  /api/ServiceCategories/{id}:
+    get:
+      tags:
+        - ServiceCategories
+      summary: Детайли за категория
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+        - ServiceCategories
+      summary: Редакция на категория
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateServiceCategoryDto'
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - ServiceCategories
+      summary: Изтриване на категория
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+
+  /api/ServiceChecks:
+    get:
+      tags:
+        - ServiceChecks
+      summary: История на проверките
+      responses:
+        '200':
+          description: OK
+
+  /api/ServiceChecks/{id}:
+    get:
+      tags:
+        - ServiceChecks
+      summary: Детайли за проверка
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - ServiceChecks
+      summary: Изтриване на проверка
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+
+  /api/ServiceChecks/sweep:
+    post:
+      tags:
+        - ServiceChecks
+      summary: Ръчен Ping Sweep
+      responses:
+        '200':
+          description: OK
+
+  /api/Services:
+    get:
+      tags:
+        - Services
+      summary: Списък с услуги
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: SearchTerm
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+        - Services
+      summary: Добавяне на услуга
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServiceDto'
+      responses:
+        '200':
+          description: OK
+
+  /api/Services/{id}:
+    get:
+      tags:
+        - Services
+      summary: Детайли за услуга
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+        - Services
+      summary: Редактиране на услуга
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateServiceDto'
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - Services
+      summary: Изтриване на услуга
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+
+  /api/Users:
+    get:
+      tags:
+        - Users
+      summary: Списък потребители
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+        - Users
+      summary: Създаване на потребител
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '200':
+          description: OK
+
+  /api/Users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Детайли за потребител
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - Users
+      summary: Изтриване на потребител
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+
+components:
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreateEngineerDto:
+      type: object
+      required: [name, email, hourlyRate]
+      properties:
+        name:
+          type: string
+          minLength: 2
+        email:
+          type: string
+          format: email
+        hiredDate:
+          type: string
+          format: date-time
+          nullable: true
+        onCall:
+          type: boolean
+        hourlyRate:
+          type: number
+          format: double
+          minimum: 0
+      additionalProperties: false
+
+    CreateIncidentDto:
+      type: object
+      required: [title, startTime, serviceId]
+      properties:
+        title:
+          type: string
+          minLength: 3
+        description:
+          type: string
+          nullable: true
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+          nullable: true
+        isScheduled:
+          type: boolean
+        serviceId:
+          type: integer
+          format: int32
+        assignedEngineerId:
+          type: integer
+          format: int32
+          nullable: true
+        isSystemGenerated:
+          type: boolean
+      additionalProperties: false
+
+    CreateIncidentUpdateDto:
+      type: object
+      required: [message, incidentId, engineerId]
+      properties:
+        message:
+          type: string
+        updateStatus:
+          type: string
+          nullable: true
+        incidentId:
+          type: integer
+          format: int32
+        engineerId:
+          type: integer
+          format: int32
+      additionalProperties: false
+
+    CreateServiceCategoryDto:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 2
+        description:
+          type: string
+          nullable: true
+        displayOrder:
+          type: integer
+          format: int32
+        notify:
+          type: boolean
+      additionalProperties: false
+
+    CreateServiceDto:
+      type: object
+      required: [name, targetUrl, categoryId]
+      properties:
+        name:
+          type: string
+          minLength: 2
+        targetUrl:
+          type: string
+          format: uri
+        categoryId:
+          type: integer
+          format: int32
+        isOnline:
+          type: boolean
+      additionalProperties: false
+
+    CreateUserDto:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 3
+        password:
+          type: string
+          minLength: 6
+      additionalProperties: false
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      additionalProperties: false
+
+    UpdateEngineerDto:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        hiredDate:
+          type: string
+          format: date-time
+          nullable: true
+        onCall:
+          type: boolean
+        hourlyRate:
+          type: number
+          format: double
+      additionalProperties: false
+
+    UpdateIncidentDto:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+          nullable: true
+        isScheduled:
+          type: boolean
+        serviceId:
+          type: integer
+          format: int32
+        assignedEngineerId:
+          type: integer
+          format: int32
+          nullable: true
+        isSystemGenerated:
+          type: boolean
+      additionalProperties: false
+
+    UpdateIncidentUpdateDto:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: integer
+          format: int32
+        message:
+          type: string
+          nullable: true
+        updateStatus:
+          type: string
+          nullable: true
+        incidentId:
+          type: integer
+          format: int32
+        engineerId:
+          type: integer
+          format: int32
+      additionalProperties: false
+
+    UpdateServiceCategoryDto:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        displayOrder:
+          type: integer
+          format: int32
+        notify:
+          type: boolean
+      additionalProperties: false
+
+    UpdateServiceDto:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+          nullable: true
+        targetUrl:
+          type: string
+          nullable: true
+        categoryId:
+          type: integer
+          format: int32
+        isOnline:
+          type: boolean
+      additionalProperties: false
