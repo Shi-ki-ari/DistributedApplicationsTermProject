@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusPageRepo", "StatusPag
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusPageServices", "StatusPageServices\StatusPageServices.csproj", "{312C0905-4F0F-465F-B85B-22B3B30C3662}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusPageRazorUI", "StatusPageRazorUI\StatusPageRazorUI.csproj", "{496830F1-DF4B-4FE7-83F1-AA27D60AF4EB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{312C0905-4F0F-465F-B85B-22B3B30C3662}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{312C0905-4F0F-465F-B85B-22B3B30C3662}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{312C0905-4F0F-465F-B85B-22B3B30C3662}.Release|Any CPU.Build.0 = Release|Any CPU
-		{496830F1-DF4B-4FE7-83F1-AA27D60AF4EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{496830F1-DF4B-4FE7-83F1-AA27D60AF4EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{496830F1-DF4B-4FE7-83F1-AA27D60AF4EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{496830F1-DF4B-4FE7-83F1-AA27D60AF4EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
