@@ -26,6 +26,15 @@ namespace StatusPageRazorUI.Pages
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string? SearchEmail { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? SortBy { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public bool SortDescending { get; set; }
+
         public PagedResult<EngineerDto> Engineers { get; private set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
@@ -42,6 +51,18 @@ namespace StatusPageRazorUI.Pages
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
                 url += $"&SearchTerm={Uri.EscapeDataString(SearchTerm)}";
+            }
+            if (!string.IsNullOrWhiteSpace(SearchEmail))
+            {
+                url += $"&SearchEmail={Uri.EscapeDataString(SearchEmail)}";
+            }
+            if (!string.IsNullOrWhiteSpace(SortBy))
+            {
+                url += $"&SortBy={Uri.EscapeDataString(SortBy)}";
+            }
+            if (SortDescending)
+            {
+                url += $"&SortDescending=true";
             }
 
             Engineers = await client.GetFromJsonAsync<PagedResult<EngineerDto>>(url)

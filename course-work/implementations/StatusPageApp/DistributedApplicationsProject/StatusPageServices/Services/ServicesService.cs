@@ -100,7 +100,27 @@ namespace StatusPageServices.Services
                     s.Name.Contains(query.SearchTerm, StringComparison.OrdinalIgnoreCase));
             }
 
-            allServices = allServices.OrderBy(s => s.Name);
+            if (!string.IsNullOrWhiteSpace(query.SearchTargetUrl))
+            {
+                allServices = allServices.Where(s =>
+                    s.TargetUrl.Contains(query.SearchTargetUrl, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                allServices = query.SortBy.ToLower() switch
+                {
+                    "name" => query.SortDescending ? allServices.OrderByDescending(s => s.Name) : allServices.OrderBy(s => s.Name),
+                    "targeturl" => query.SortDescending ? allServices.OrderByDescending(s => s.TargetUrl) : allServices.OrderBy(s => s.TargetUrl),
+                    "dateadded" => query.SortDescending ? allServices.OrderByDescending(s => s.DateAdded) : allServices.OrderBy(s => s.DateAdded),
+                    "uptime" => query.SortDescending ? allServices.OrderByDescending(s => s.UptimePercentage) : allServices.OrderBy(s => s.UptimePercentage),
+                    _ => query.SortDescending ? allServices.OrderByDescending(s => s.Name) : allServices.OrderBy(s => s.Name)
+                };
+            }
+            else
+            {
+                allServices = query.SortDescending ? allServices.OrderByDescending(s => s.Name) : allServices.OrderBy(s => s.Name);
+            }
 
             int totalCount = allServices.Count();
 

@@ -25,6 +25,15 @@ namespace StatusPageRazorUI.Pages
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string? SearchTargetUrl { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? SortBy { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public bool SortDescending { get; set; }
+
         public PagedResult<ServiceDto> Services { get; private set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
@@ -41,6 +50,18 @@ namespace StatusPageRazorUI.Pages
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
                 url += $"&SearchTerm={Uri.EscapeDataString(SearchTerm)}";
+            }
+            if (!string.IsNullOrWhiteSpace(SearchTargetUrl))
+            {
+                url += $"&SearchTargetUrl={Uri.EscapeDataString(SearchTargetUrl)}";
+            }
+            if (!string.IsNullOrWhiteSpace(SortBy))
+            {
+                url += $"&SortBy={Uri.EscapeDataString(SortBy)}";
+            }
+            if (SortDescending)
+            {
+                url += $"&SortDescending=true";
             }
 
             Services = await client.GetFromJsonAsync<PagedResult<ServiceDto>>(url)

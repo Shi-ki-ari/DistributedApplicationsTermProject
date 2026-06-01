@@ -1,4 +1,6 @@
 using System.Net.Http.Json;
+using System.Net.Http.Json;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -52,6 +54,13 @@ namespace StatusPageRazorUI.Pages
                 Secure = true,
                 SameSite = SameSiteMode.Strict
             });
+
+            var claims = new List<System.Security.Claims.Claim>
+            {
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, Username)
+            };
+            var identity = new System.Security.Claims.ClaimsIdentity(claims, Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme, new System.Security.Claims.ClaimsPrincipal(identity));
 
             return RedirectToPage("/Engineers");
         }

@@ -91,7 +91,27 @@ namespace StatusPageServices.Services
                     e.Name.Contains(query.SearchTerm, StringComparison.OrdinalIgnoreCase));
             }
 
-            allEngineers = allEngineers.OrderBy(e => e.Name);
+            if (!string.IsNullOrWhiteSpace(query.SearchEmail))
+            {
+                allEngineers = allEngineers.Where(e =>
+                    e.Email.Contains(query.SearchEmail, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                allEngineers = query.SortBy.ToLower() switch
+                {
+                    "name" => query.SortDescending ? allEngineers.OrderByDescending(e => e.Name) : allEngineers.OrderBy(e => e.Name),
+                    "email" => query.SortDescending ? allEngineers.OrderByDescending(e => e.Email) : allEngineers.OrderBy(e => e.Email),
+                    "hireddate" => query.SortDescending ? allEngineers.OrderByDescending(e => e.HiredDate) : allEngineers.OrderBy(e => e.HiredDate),
+                    "hourlyrate" => query.SortDescending ? allEngineers.OrderByDescending(e => e.HourlyRate) : allEngineers.OrderBy(e => e.HourlyRate),
+                    _ => query.SortDescending ? allEngineers.OrderByDescending(e => e.Name) : allEngineers.OrderBy(e => e.Name)
+                };
+            }
+            else
+            {
+                allEngineers = query.SortDescending ? allEngineers.OrderByDescending(e => e.Name) : allEngineers.OrderBy(e => e.Name);
+            }
 
             int totalCount = allEngineers.Count();
 

@@ -54,5 +54,13 @@ namespace DistributedApplicationsProject.Controllers
             await _servicesService.DeleteAsync(id);
             return NoContent();
         }
+
+        [HttpGet("test-error")]
+        [AllowAnonymous] // So you don't need a token to test it quickly
+        public IActionResult ThrowError()
+        {
+            // Deliberately throw an unhandled exception
+            throw new Exception("This is a test exception to trigger the GlobalExceptionHandler!");
+        }
     }
 }

@@ -10,11 +10,29 @@
 </div>
 
 <form method="get" class="row g-2 mb-3">
-    <div class="col-md-6">
-        <input class="form-control" name="SearchTerm" value="@Model.SearchTerm" placeholder="Search services..." />
+    <div class="col-md-3">
+        <input class="form-control" name="SearchTerm" value="@Model.SearchTerm" placeholder="Search name..." />
+    </div>
+    <div class="col-md-3">
+        <input class="form-control" name="SearchTargetUrl" value="@Model.SearchTargetUrl" placeholder="Search target URL..." />
     </div>
     <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">Search</button>
+        <select class="form-select" name="SortBy">
+            <option value="">Sort by (default)</option>
+            <option value="name" selected="@(Model.SortBy == "name")">Name</option>
+            <option value="targeturl" selected="@(Model.SortBy == "targeturl")">Target URL</option>
+            <option value="dateadded" selected="@(Model.SortBy == "dateadded")">Date Added</option>
+            <option value="uptime" selected="@(Model.SortBy == "uptime")">Uptime</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" name="SortDescending">
+            <option value="false" selected="@(!Model.SortDescending)">Ascending</option>
+            <option value="true" selected="@(Model.SortDescending)">Descending</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Apply</button>
     </div>
     <input type="hidden" name="PageSize" value="@Model.PageSize" />
 </form>

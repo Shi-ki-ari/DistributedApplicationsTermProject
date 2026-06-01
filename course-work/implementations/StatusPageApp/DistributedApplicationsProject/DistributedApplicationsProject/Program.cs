@@ -15,6 +15,7 @@ using StatusPageRepo.Implementations;
 using StatusPageServices.Interfaces;
 using StatusPageServices.Services;
 using StatusPageServices.Validation.Creates;
+using DistributedApplicationsProject.Middleware;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -108,9 +109,14 @@ builder.Services.AddScoped<IServiceChecksService, ServiceChecksService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<TokenService>();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
