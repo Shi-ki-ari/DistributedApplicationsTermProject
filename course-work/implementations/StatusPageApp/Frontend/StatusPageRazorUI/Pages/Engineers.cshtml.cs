@@ -116,5 +116,28 @@ namespace StatusPageRazorUI.Pages
 
             return RedirectToPage("/Engineers", new { PageNumber, PageSize, SearchTerm });
         }
+
+        public async Task<IActionResult> OnPostEditAsync(int id, string name, string email, DateTime hiredDate, bool onCall, decimal hourlyRate)
+        {
+            if (!Request.Cookies.TryGetValue("JWTToken", out var token) || string.IsNullOrWhiteSpace(token))
+            {
+                return RedirectToPage("/Login");
+            }
+
+            var client = _httpClientFactory.CreateClient("ApiClient");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            await client.PutAsJsonAsync($"api/engineers/{id}", new
+            {
+                Id = id,
+                Name = name,
+                Email = email,
+                HiredDate = hiredDate,
+                OnCall = onCall,
+                HourlyRate = hourlyRate
+            });
+
+            return RedirectToPage("/Engineers", new { PageNumber, PageSize, SearchTerm });
+        }
     }
 }

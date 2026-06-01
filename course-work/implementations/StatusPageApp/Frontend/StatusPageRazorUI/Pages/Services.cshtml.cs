@@ -88,7 +88,29 @@ namespace StatusPageRazorUI.Pages
                 IsOnline = isOnline
             });
 
-            return RedirectToPage("/Services", new { PageNumber, PageSize, SearchTerm });
+            return RedirectToPage("/Services", new { PageNumber, PageSize, SearchTerm, SearchTargetUrl, SortBy, SortDescending });
+        }
+
+        public async Task<IActionResult> OnPostEditAsync(int id, string name, string targetUrl, int categoryId, bool isOnline)
+        {
+            if (!Request.Cookies.TryGetValue("JWTToken", out var token) || string.IsNullOrWhiteSpace(token))
+            {
+                return RedirectToPage("/Login");
+            }
+
+            var client = _httpClientFactory.CreateClient("ApiClient");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            await client.PutAsJsonAsync($"{ServicesApiUrl}/{id}", new
+            {
+                Id = id,
+                Name = name,
+                TargetUrl = targetUrl,
+                CategoryId = categoryId,
+                IsOnline = isOnline
+            });
+
+            return RedirectToPage("/Services", new { PageNumber, PageSize, SearchTerm, SearchTargetUrl, SortBy, SortDescending });
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(int id)
@@ -103,7 +125,7 @@ namespace StatusPageRazorUI.Pages
 
             await client.DeleteAsync($"{ServicesApiUrl}/{id}");
 
-            return RedirectToPage("/Services", new { PageNumber, PageSize, SearchTerm });
+            return RedirectToPage("/Services", new { PageNumber, PageSize, SearchTerm, SearchTargetUrl, SortBy, SortDescending });
         }
     }
 }

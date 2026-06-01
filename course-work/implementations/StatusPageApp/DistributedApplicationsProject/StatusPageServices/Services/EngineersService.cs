@@ -80,9 +80,10 @@ namespace StatusPageServices.Services
             entity.HourlyRate = dto.HourlyRate;
         }
 
-        //pagination and filtering
+        //filtering, sorting and pagination
         public async Task<PagedResult<EngineerDto>> GetPagedEngineersAsync(PaginationQuery query)
         {
+            //filtering
             var allEngineers = await _repo.GetAllAsync();
 
             if (!string.IsNullOrWhiteSpace(query.SearchTerm))
@@ -96,7 +97,7 @@ namespace StatusPageServices.Services
                 allEngineers = allEngineers.Where(e =>
                     e.Email.Contains(query.SearchEmail, StringComparison.OrdinalIgnoreCase));
             }
-
+            //sorting
             if (!string.IsNullOrWhiteSpace(query.SortBy))
             {
                 allEngineers = query.SortBy.ToLower() switch
@@ -112,7 +113,7 @@ namespace StatusPageServices.Services
             {
                 allEngineers = query.SortDescending ? allEngineers.OrderByDescending(e => e.Name) : allEngineers.OrderBy(e => e.Name);
             }
-
+            //pagination
             int totalCount = allEngineers.Count();
 
             var pagedItems = allEngineers

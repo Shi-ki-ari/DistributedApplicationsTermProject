@@ -96,14 +96,12 @@ namespace StatusPageServices.Services
         {
             var allIncidents = await _repo.GetAllAsync();
 
-            // FILTER: Search by Incident Title
             if (!string.IsNullOrWhiteSpace(query.SearchTerm))
             {
                 allIncidents = allIncidents.Where(i =>
                     i.Title.Contains(query.SearchTerm, StringComparison.OrdinalIgnoreCase));
             }
 
-            // SORT: Newest Incidents at the top!
             allIncidents = allIncidents.OrderByDescending(i => i.StartTime);
 
             int totalCount = allIncidents.Count();

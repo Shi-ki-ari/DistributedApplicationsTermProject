@@ -5,6 +5,7 @@ using StatusPageServices.RequestDTO;
 using StatusPageServices.RequestDTO.Services;
 using StatusPageServices.ResponseDTO;
 using StatusPageServices.ResponseDTO.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,8 +14,11 @@ namespace StatusPageServices.Services
 {
     public class ServicesService : BaseService<StatusPageData.Entities.ServiceEntity>, IServicesService
     {
-        public ServicesService(IRepo<StatusPageData.Entities.ServiceEntity> repo) : base(repo)
+        private readonly IRepo<ServiceCategoryEntity> _categoryRepo;
+
+        public ServicesService(IRepo<ServiceEntity> repo, IRepo<ServiceCategoryEntity> categoryRepo) : base(repo)
         {
+            _categoryRepo = categoryRepo;
         }
 
         public async Task<ServiceDto> CreateAsync(CreateServiceDto dto)
@@ -54,9 +58,9 @@ namespace StatusPageServices.Services
             await UpdateEntityAsync(existing);
         }
 
-        private static StatusPageData.Entities.ServiceEntity ToEntity(CreateServiceDto dto)
+        private static ServiceEntity ToEntity(CreateServiceDto dto)
         {
-            return new StatusPageData.Entities.ServiceEntity
+            return new ServiceEntity
             {
                 Name = dto.Name,
                 TargetUrl = dto.TargetUrl,
@@ -67,7 +71,7 @@ namespace StatusPageServices.Services
             };
         }
 
-        private static ServiceDto ToDto(StatusPageData.Entities.ServiceEntity entity)
+        private static ServiceDto ToDto(ServiceEntity entity)
         {
             return new ServiceDto(
                 entity.Id,
@@ -80,7 +84,7 @@ namespace StatusPageServices.Services
             );
         }
 
-        private static void ApplyUpdate(StatusPageData.Entities.ServiceEntity entity, UpdateServiceDto dto)
+        private static void ApplyUpdate(ServiceEntity entity, UpdateServiceDto dto)
         {
             entity.Name = dto.Name;
             entity.TargetUrl = dto.TargetUrl;
@@ -88,11 +92,12 @@ namespace StatusPageServices.Services
             entity.CategoryId = dto.CategoryId;
         }
 
-
-        //pagination and filtering
+        // pagination and filtering
         public async Task<PagedResult<ServiceDto>> GetPagedServicesAsync(PaginationQuery query)
         {
             var allServices = await _repo.GetAllAsync();
+
+            var allCategories = await _categoryRepo.GetAllAsync();
 
             if (!string.IsNullOrWhiteSpace(query.SearchTerm))
             {
@@ -111,7 +116,10 @@ namespace StatusPageServices.Services
                 allServices = query.SortBy.ToLower() switch
                 {
                     "name" => query.SortDescending ? allServices.OrderByDescending(s => s.Name) : allServices.OrderBy(s => s.Name),
-                    "targeturl" => query.SortDescending ? allServices.OrderByDescending(s => s.TargetUrl) : allServices.OrderBy(s => s.TargetUrl),
+
+                    "displayorder" => query.SortDescending
+                        ? allServices.OrderByDescending(s => allCategories.FirstOrDefault(c => c.Id == s.CategoryId)?.DisplayOrder ?? 0)
+                        : allServices.OrderBy(s => allCategories.FirstOrDefault(c => c.Id == s.CategoryId)?.DisplayOrder ?? 0),
                     "dateadded" => query.SortDescending ? allServices.OrderByDescending(s => s.DateAdded) : allServices.OrderBy(s => s.DateAdded),
                     "uptime" => query.SortDescending ? allServices.OrderByDescending(s => s.UptimePercentage) : allServices.OrderBy(s => s.UptimePercentage),
                     _ => query.SortDescending ? allServices.OrderByDescending(s => s.Name) : allServices.OrderBy(s => s.Name)
@@ -138,6 +146,5 @@ namespace StatusPageServices.Services
                 PageSize = query.PageSize
             };
         }
-
     }
 }

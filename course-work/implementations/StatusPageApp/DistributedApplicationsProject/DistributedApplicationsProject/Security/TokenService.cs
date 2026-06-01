@@ -23,7 +23,6 @@ namespace StatusPageServices.Services
                 signingCredentials: creds
             );
 
-            // 4. Turn it into a string
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
